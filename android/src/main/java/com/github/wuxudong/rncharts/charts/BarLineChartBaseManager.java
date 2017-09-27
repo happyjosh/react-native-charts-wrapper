@@ -119,4 +119,19 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
             );
         }
     }
+
+    @ReactProp(name = "scaleLimit")
+    public void setScaleLimit(BarLineChartBase chart, ReadableMap propMap){
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "scaleMinX") &&
+                BridgeUtils.validate(propMap, ReadableType.Number, "scaleMinY")){
+            chart.setScaleMinima((float) propMap.getDouble("scaleMinX"),
+                    (float) propMap.getDouble("scaleMinY"));
+        }
+
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "scaleMaxX") &&
+                BridgeUtils.validate(propMap, ReadableType.Number, "scaleMaxY")){
+            chart.setScaleMaxima((float) propMap.getDouble("scaleMaxX"),
+                    (float) propMap.getDouble("scaleMaxY"));
+        }
+    }
 }

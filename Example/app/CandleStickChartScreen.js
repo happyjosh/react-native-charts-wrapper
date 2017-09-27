@@ -170,6 +170,7 @@ class CandleStickChartScreen extends React.Component {
             maxVisibleValueCount={16}
             autoScaleMinMaxEnabled={true}
             zoom={{scaleX: 2, scaleY: 1, xValue:  400000, yValue: 1}}
+            scaleLimit={{scaleMinX: 1, scaleMinY: 1, scaleMaxX:  4, scaleMaxY: 4}}
             onSelect={this.handleSelect.bind(this)}
           />
         </View>
