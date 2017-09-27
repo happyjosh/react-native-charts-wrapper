@@ -3,198 +3,251 @@
  */
 
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, processColor} from 'react-native';
+import {
+    UIManager, View, Text, StyleSheet, processColor, ToastAndroid, findNodeHandle, Touchable,
+    TouchableWithoutFeedback, TouchableOpacity
+} from 'react-native';
 
 import {CombinedChart} from 'react-native-charts-wrapper';
+import update from 'immutability-helper';
+import _ from 'lodash';
+import {barData, candleData, line2Data, lineData} from "./testData";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    backgroundColor: 'transparent'
-  }
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        backgroundColor: 'transparent'
+    }
 });
 
 export default class Combined extends Component {
 
-  constructor() {
-    super();
-    this.state = {
-      xAxis: {
-        valueFormatter: ['1990', '1991', '1992', '1993', '1994'],
-        granularityEnabled: true,
-        granularity: 1
-      },
+    constructor() {
+        super();
+        this.state = {
+            data1: {
+                lineData: {
+                    dataSets: [
+                        {
+                            values: lineData,
+                            label: 'Sine function',
 
+                            config: {
+                                drawValues: false,
+                                colors: [processColor('#ff9500')],
+                                mode: "CUBIC_BEZIER",
+                                drawCircles: false,
+                                lineWidth: 1,
+                            }
+                        },
+                        {
+                            values: line2Data,
+                            label: 'Sine function',
 
-      data: {
-        barData: {
-          dataSets: [{
-            values: [40, 5, 50, 23, 79],
-            label: 'Company B',
+                            config: {
+                                drawValues: false,
+                                colors: [processColor('#007aff')],
+                                mode: "CUBIC_BEZIER",
+                                drawCircles: false,
+                                lineWidth: 1,
+                            }
+                        }
+                    ],
+                },
+                candleData: {
+                    dataSets: [{
+                        values: candleData,
+                        label: 'AAPL',
+                        config: {
+                            highlightColor: processColor('darkgray'),
 
-            config: {
-              drawValues: false,
-              colors: [processColor('red')],
-            }
+                            shadowColor: processColor('black'),
+                            shadowWidth: 1,
+                            shadowColorSameAsCandle: true,
+                            increasingColor: processColor('#71BD6A'),
+                            increasingPaintStyle: 'fill',
+                            decreasingColor: processColor('#D14B5A')
+                        }
+                    }],
+                },
+            },
+            data2: {
+                barData: {
+                    dataSets: [
+                        {
+                            values: barData,
+                            label: 'Zero line dataset',
+                            config: {
+                                color: processColor('blue'),
+                            }
+                        }
+                    ],
+                }
+            },
+            xAxis1: {},
+            yAxis1: {},
+            // xAxis2: {},
+            // yAxis2: {},
+        };
 
-          }]
-        },
-        lineData: {
-          dataSets: [{
-            values: [50, 100, 50, 100, 50],
-            label: 'Sine function',
-
-            config: {
-              drawValues: false,
-              colors: [processColor('green')],
-              mode: "CUBIC_BEZIER",
-              drawCircles: false,
-              lineWidth: 2,
-            }
-          }, {
-            values: [100, 50, 100, 50, 100],
-            label: 'Cosine function',
-
-            config: {
-              drawValues: false,
-              colors: [processColor('blue')],
-              mode: "CUBIC_BEZIER",
-              drawCircles: false,
-              lineWidth: 2,
-            }
-          }],
-        },
-        bubbleData: {
-          dataSets: [{
-            values: [{
-              size: 2.3,
-              y: 180
-            }, {
-              size: 1.4,
-              y: 150
-            }, {
-              size: 2.0,
-              y: 106
-            }, {
-              size: 5.0,
-              y: 100
-            }, {
-              size: 4.1,
-              y: 65
-            }],
-            label: 'Company A',
-            config: {
-              drawValues: false,
-              colors: [processColor('pink')],
-            }
-          }],
-        },
-        candleData: {
-          dataSets: [{
-            values: [{
-              shadowH: 20,
-              shadowL: 5,
-              open: 15,
-              close: 10
-            }, {
-              shadowH: 30,
-              shadowL: 10,
-              open: 25,
-              close: 15
-            }, {
-              shadowH: 10,
-              shadowL: 5,
-              open: 15,
-              close: 10
-            }, {
-              shadowH: 50,
-              shadowL: 5,
-              open: 15,
-              close: 25
-            }],
-            label: 'Company A',
-
-            config: {
-              drawValues: false,
-
-              highlightColor: processColor('darkgray'),
-
-              shadowColor: processColor('black'),
-              shadowWidth: 1,
-              shadowColorSameAsCandle: true,
-              increasingColor: processColor('yellow'),
-              increasingPaintStyle: 'fill',
-              decreasingColor: processColor('green')
-            }
-          }],
-        },
-        scatterData: {
-          dataSets: [{
-            values: [15, 40, 77, 81, 43],
-            label: 'Company A',
-
-            config: {
-              colors: [processColor('purple')],
-              drawValues: false,
-              scatterShape: 'SQUARE',
-            }
-
-          }, {
-            values: [40, 5, 50, 23, 79],
-            label: 'Company B',
-
-            config: {
-              drawValues: false,
-              colors: [processColor('grey')],
-              scatterShape: 'CIRCLE',
-            }
-          }, {
-            values: [10, 55, 35, 90, 82],
-            label: 'Company C',
-
-            config: {
-              drawValues: false,
-              colors: [processColor('brown')],
-              scatterShape: 'TRIANGLE',
-            }
-          }],
-        },
-      }
-    };
-
-  }
-
-
-  static displayName = 'Combined';
-
-  handleSelect(event) {
-    let entry = event.nativeEvent
-    if (entry == null) {
-      this.setState({...this.state, selectedEntry: null})
-    } else {
-      this.setState({...this.state, selectedEntry: JSON.stringify(entry)})
     }
-  }
 
-  render() {
-    return (
-      <View style={{flex: 1}}>
+    componentDidMount() {
+        this.setState(
+            update(this.state, {
+                    xAxis1: {
+                        $set: {
+                            drawGridLines: true,
+                            position: 'BOTTOM',
+                            labelCount: 8,
+                            labelCountForce: true,
+                        }
+                    },
+                    yAxis1: {
+                        $set: {
+                            left: {
+                                enabled: false,
+                            },
+                            right: {
+                                drawGridLines: true,
+                                valueFormatter: '$ #',
+                                labelCount: 6,
+                                labelCountForce: true,
+                            }
+                        }
+                    },
+                    xAxis2: {
+                        $set: {
+                            enabled: false
+                        }
+                    },
+                    yAxis2: {
+                        $set: {
+                            left: {
+                                enabled: false,
+                            },
+                            right: {
+                                valueFormatter: '$ #',
+                                labelCount: 2,
+                                labelCountForce: true,
+                            }
+                        }
+                    },
+                }
+            ));
 
-        <View style={{height:80}}>
-          <Text> selected entry</Text>
-          <Text> {this.state.selectedEntry}</Text>
-        </View>
+        //对其两个图标
+        this.getChart1ExtraOffset();
+    }
+
+    static displayName = 'Combined';
+
+    handleSelect(event) {
+        let entry = event.nativeEvent;
+        if (entry == null) {
+            this.setState({...this.state, selectedEntry: null})
+        } else {
+            this.setState({...this.state, selectedEntry: JSON.stringify(entry)})
+        }
+    }
+
+    getChart1ExtraOffset() {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
+            UIManager.RNCombinedChart.Commands.getExtraOffset,
+            null
+        );
+    }
+
+    //得到图标1的位置，使图标2与之对齐
+    handleChartExtraOffset(event, chartRef) {
+        console.log('handleChart1ExtraOffset');
+
+        let {extraLeftOffset, extraRightOffset} = event.nativeEvent;
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
+            UIManager.RNCombinedChart.Commands.setExtraOffset,
+            [extraLeftOffset, extraRightOffset]
+        );
+
+    }
+
+    //调整图表2跟随图表1
+    handleChartMatrixChange(event, chartRef) {
+        let {matrix} = event.nativeEvent;
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
+            UIManager.RNCombinedChart.Commands.changeMatrix,
+            matrix
+        );
+    }
+
+    stopAllChartsDeceleration() {
+        this.stopChartDeceleration('chart1');
+        this.stopChartDeceleration('chart2');
+    }
+
+    stopChartDeceleration(chartRef) {
+        UIManager.dispatchViewManagerCommand(
+            findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
+            UIManager.RNCombinedChart.Commands.stopDeceleration,
+            null
+        );
+    }
+
+    render() {
+        return (
+            <View
+                style={{flex: 1}}
+                onStartShouldSetResponder={(event) => {
+                    this.stopAllChartsDeceleration();
+                    return false;
+                }}
+            >
+
+                {/*<View style={{height: 80}}>*/}
+                {/*<Text> selected entry</Text>*/}
+                {/*<Text> {this.state.selectedEntry}</Text>*/}
+                {/*</View>*/}
 
 
-        <CombinedChart
-          data={this.state.data}
-          xAxis={this.state.xAxis}
-          onSelect={this.handleSelect.bind(this)}
-          style={styles.container}/>
+                <CombinedChart
+                    ref='chart1'
+                    style={{flex: 2}}
+                    data={this.state.data1}
+                    marker={this.state.marker}
+                    description={{text: '1111'}}
+                    legend={this.state.legend}
+                    xAxis={this.state.xAxis1}
+                    yAxis={this.state.yAxis1}
+                    maxVisibleValueCount={16}//屏幕内放大到多少数量时可以显示值
+                    autoScaleMinMaxEnabled={true}
+                    doubleTapToZoomEnabled={false}
+                    // zoom={{scaleX: 2, scaleY: 1, xValue: 1, yValue: 1}}//默认缩放
+                    scaleYEnabled={false}
+                    // pinchZoom={true}
+                    onSelect={this.handleSelect.bind(this)}
+                    onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart2')}
+                    onGetExtraOffset={(event) => this.handleChartExtraOffset(event, 'chart2')}
+                />
 
-      </View>
-    );
-  }
+                <CombinedChart
+                    ref='chart2'
+                    style={{flex: 1}}
+                    data={this.state.data2}
+                    xAxis={this.state.xAxis2}
+                    yAxis={this.state.yAxis2}
+                    description={{text: '2222'}}
+                    maxVisibleValueCount={16}//屏幕内放大到多少数量时可以显示值
+                    doubleTapToZoomEnabled={false}
+                    autoScaleMinMaxEnabled={true}
+                    zoom={this.state.zoom2}
+                    legend={{enabled: false}}
+                    onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
+                />
+            </View>
+        );
+    }
 }
