@@ -86,8 +86,8 @@ export default class Combined extends Component {
                     ],
                 }
             },
-            xAxis1: {},
-            yAxis1: {},
+            // xAxis1: {},
+            // yAxis1: {},
             // xAxis2: {},
             // yAxis2: {},
         };
@@ -133,6 +133,14 @@ export default class Combined extends Component {
                                 labelCount: 2,
                                 labelCountForce: true,
                             }
+                        }
+                    },
+                    floatYLabel1: {
+                        $set: {
+                            enabled: true,
+                            textSize: 10,
+                            textColor: processColor('#D14B5A'),
+                            value: 100,
                         }
                     },
                 }
@@ -222,6 +230,7 @@ export default class Combined extends Component {
                     legend={this.state.legend}
                     xAxis={this.state.xAxis1}
                     yAxis={this.state.yAxis1}
+                    floatYLabel={this.state.floatYLabel1}
                     maxVisibleValueCount={16}//屏幕内放大到多少数量时可以显示值
                     autoScaleMinMaxEnabled={true}
                     doubleTapToZoomEnabled={false}

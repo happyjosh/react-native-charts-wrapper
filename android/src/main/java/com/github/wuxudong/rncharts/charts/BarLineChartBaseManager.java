@@ -15,8 +15,10 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.FloatYLabel;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
+import com.github.wuxudong.rncharts.markers.MFloatYLabel;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 
 import java.util.Map;
@@ -155,6 +157,31 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         }
     }
 
+    @ReactProp(name = "floatYLabel")
+    public void setFloatYLabel(BarLineChartBase chart, ReadableMap propMap) {
+        Log.i(TAG, "setFloatYLabel");
+        if (!BridgeUtils.validate(propMap, ReadableType.Boolean, "enabled") || !propMap.getBoolean("enabled")) {
+            chart.setRightFloatYLabel(null);
+            return;
+        }
+
+        FloatYLabel floatYLabel = new MFloatYLabel(chart.getContext());
+        floatYLabel.setChartView(chart);
+
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "textColor")) {
+            floatYLabel.getLabelText().setTextColor(propMap.getInt("textColor"));
+        }
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "textSize")) {
+            floatYLabel.getLabelText().setTextSize(propMap.getInt("textSize"));
+        }
+
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "value")) {
+            chart.setFloatYValue((float) propMap.getDouble("value"));
+        }
+
+        chart.setRightFloatYLabel(floatYLabel);
+    }
+
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
@@ -198,14 +225,14 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     @Override
     public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
         return MapBuilder.<String, Object>builder()
-                //拖拽和缩放时回调
+                //????????
                 .put("topMatrixChange", MapBuilder.of("registrationName", "onMatrixChange"))
                 .put("topGetExtraOffset", MapBuilder.of("registrationName", "onGetExtraOffset"))
                 .build();
     }
 
     /**
-     * 改变图表的缩放和移动位置
+     * ????????????
      *
      * @param chart
      * @param args
@@ -234,7 +261,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     }
 
     /**
-     * 返回extraOffset到js
+     * ??extraOffset?js
      */
     private void responseExtraOffset(Chart chart) {
         Log.i(TAG, "responseExtraOffset");
@@ -251,7 +278,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     }
 
     /**
-     * 设置位置
+     * ????
      *
      * @param chart
      * @param args
@@ -263,7 +290,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     }
 
     /**
-     * 停止惯性滑动
+     * ??????
      *
      * @param chart
      */
