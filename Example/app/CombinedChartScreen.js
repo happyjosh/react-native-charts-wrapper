@@ -40,6 +40,7 @@ export default class Combined extends Component {
                                 mode: "CUBIC_BEZIER",
                                 drawCircles: false,
                                 lineWidth: 1,
+                                axisDependency: 'RIGHT',
                             }
                         },
                         {
@@ -52,6 +53,7 @@ export default class Combined extends Component {
                                 mode: "CUBIC_BEZIER",
                                 drawCircles: false,
                                 lineWidth: 1,
+                                axisDependency: 'RIGHT',
                             }
                         }
                     ],
@@ -68,7 +70,8 @@ export default class Combined extends Component {
                             shadowColorSameAsCandle: true,
                             increasingColor: processColor('#71BD6A'),
                             increasingPaintStyle: 'fill',
-                            decreasingColor: processColor('#D14B5A')
+                            decreasingColor: processColor('#D14B5A'),
+                            axisDependency: 'RIGHT',
                         }
                     }],
                 },
@@ -81,6 +84,7 @@ export default class Combined extends Component {
                             label: 'Zero line dataset',
                             config: {
                                 color: processColor('blue'),
+                                axisDependency: 'RIGHT',
                             }
                         }
                     ],
@@ -103,6 +107,7 @@ export default class Combined extends Component {
                             position: 'BOTTOM',
                             labelCount: 8,
                             labelCountForce: true,
+                            textSize:10,
                         }
                     },
                     yAxis1: {
@@ -112,9 +117,10 @@ export default class Combined extends Component {
                             },
                             right: {
                                 drawGridLines: true,
-                                valueFormatter: '$ #',
+                                valueFormatter: '#',
                                 labelCount: 6,
                                 labelCountForce: true,
+                                textSize:10,
                             }
                         }
                     },
@@ -129,9 +135,10 @@ export default class Combined extends Component {
                                 enabled: false,
                             },
                             right: {
-                                valueFormatter: '$ #',
+                                valueFormatter: '#',
                                 labelCount: 2,
                                 labelCountForce: true,
+                                textSize:10,
                             }
                         }
                     },
