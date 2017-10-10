@@ -154,8 +154,13 @@ export default class Combined extends Component {
                         $set: {
                             enabled: true,
                             textSize: 10,
-                            textColor: processColor('#D14B5A'),
+                            textColor: processColor('white'),
                             value: 100,
+                            backgroundColor: processColor('red'),
+                            paddingLeft: 5,
+                            paddingTop: 2,
+                            paddingRight: 5,
+                            paddingBottom: 2,
                         }
                     },
                 }
