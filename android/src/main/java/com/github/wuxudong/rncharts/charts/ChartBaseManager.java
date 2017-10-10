@@ -6,6 +6,7 @@ import android.os.Build;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.github.mikephil.charting.animation.Easing.EasingOption;
@@ -24,7 +25,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.wuxudong.rncharts.data.DataExtract;
-import com.github.wuxudong.rncharts.listener.RNOnChartValueSelectedListener;
 import com.github.wuxudong.rncharts.markers.RNRectangleMarkerView;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 
@@ -322,6 +322,25 @@ public abstract class ChartBaseManager<T extends Chart, U extends Entry> extends
                     }
                     if (BridgeUtils.validate(limitLineMap, ReadableType.Number, "lineWidth")) {
                         limitLine.setLineWidth((float) limitLineMap.getDouble("lineWidth"));
+                    }
+
+                    if (BridgeUtils.validate(limitLineMap, ReadableType.Boolean, "enableDashLine")
+                            && limitLineMap.getBoolean("enableDashLine")) {
+                        float lineLength = 0;
+                        float spaceLength = 0;
+                        float phase = 0;
+
+                        if (BridgeUtils.validate(limitLineMap, ReadableType.Number, "dashLineLength")) {
+                            lineLength = PixelUtil.toPixelFromDIP(limitLineMap.getDouble("dashLineLength"));
+                        }
+                        if (BridgeUtils.validate(limitLineMap, ReadableType.Number, "dashSpaceLength")) {
+                            spaceLength = PixelUtil.toPixelFromDIP(limitLineMap.getDouble("dashSpaceLength"));
+                        }
+                        if (BridgeUtils.validate(limitLineMap, ReadableType.Number, "dashPhase")) {
+                            phase = PixelUtil.toPixelFromDIP(limitLineMap.getDouble("dashPhase"));
+                        }
+
+                        limitLine.enableDashedLine(lineLength, spaceLength, phase);
                     }
 
                     axis.addLimitLine(limitLine);

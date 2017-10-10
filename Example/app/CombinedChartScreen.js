@@ -107,7 +107,7 @@ export default class Combined extends Component {
                             position: 'BOTTOM',
                             labelCount: 8,
                             labelCountForce: true,
-                            textSize:10,
+                            textSize: 10,
                         }
                     },
                     yAxis1: {
@@ -120,7 +120,15 @@ export default class Combined extends Component {
                                 valueFormatter: '#',
                                 labelCount: 6,
                                 labelCountForce: true,
-                                textSize:10,
+                                textSize: 10,
+                                limitLines: [{
+                                    limit: 100,
+                                    lineColor: processColor('red'),
+                                    enableDashLine: true,
+                                    dashLineLength: 3,
+                                    dashSpaceLength: 6,
+                                    dashPhase: 0,
+                                },],
                             }
                         }
                     },
@@ -138,7 +146,7 @@ export default class Combined extends Component {
                                 valueFormatter: '#',
                                 labelCount: 2,
                                 labelCountForce: true,
-                                textSize:10,
+                                textSize: 10,
                             }
                         }
                     },
