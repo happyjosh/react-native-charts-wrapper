@@ -15,5 +15,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.facebook.react:react-native:0.20.+'
-    compile 'com.github.PhilJay.XXX:MPChartLib:1.0.8'
+    compile 'com.github.PhilJay.XXX:MPChartLib:1.1.0'
 }

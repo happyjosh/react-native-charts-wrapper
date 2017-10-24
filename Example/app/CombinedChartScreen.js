@@ -11,7 +11,7 @@ import {
 import {CombinedChart} from 'react-native-charts-wrapper';
 import update from 'immutability-helper';
 import _ from 'lodash';
-import {barData, candleData, line2Data, lineData} from "./testData";
+import {barData, bottomLineData, candleData, line2Data, lineData} from "./testData";
 
 const styles = StyleSheet.create({
   container: {
@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
 });
 
 export default class Combined extends Component {
+  _viewHeights = {chart1: 0, chart2: 0};
 
   constructor() {
     super();
@@ -88,6 +89,26 @@ export default class Combined extends Component {
               config: {
                 color: processColor('blue'),
                 axisDependency: 'RIGHT',
+                highlightEnabled: false,
+              }
+            }
+          ],
+        },
+        lineData: {
+          dataSets: [
+            {
+              values: bottomLineData,
+              label: 'Sine function',
+
+              config: {
+                drawValues: false,
+                colors: [processColor('#ff9500')],
+                mode: "CUBIC_BEZIER",
+                drawCircles: false,
+                lineWidth: 1,
+                axisDependency: 'RIGHT',
+                highlightColor: processColor('black'),
+                highlightLineWidth: 1,
               }
             }
           ],
@@ -157,7 +178,11 @@ export default class Combined extends Component {
           },
           xAxis2: {
             $set: {
-              enabled: false
+              drawGridLines: true,
+              position: 'BOTTOM',
+              labelCount: 8,
+              labelCountForce: true,
+              textSize: 10,
             }
           },
           yAxis2: {
@@ -189,18 +214,34 @@ export default class Combined extends Component {
         }
       ));
 
-    //对其两个图标
+    //对其两个图表
     this.getChart1ExtraOffset();
   }
 
   static displayName = 'Combined';
 
-  handleSelect(event) {
-    let entry = event.nativeEvent;
-    if (entry == null) {
-      this.setState({...this.state, selectedEntry: null})
+  handleSelect(event, chartRef) {
+    let {entry, highlight} = event.nativeEvent;
+    if (event.nativeEvent && highlight) {
+      //选中
+      //TODO 根据桥接代码的获取顺序暂时规定判断Index
+      // let dataIndex = 'chart1' === chartRef ? 1 : 0;
+      // let dataSetIndex = 0;
+      let manualYOffset = 'chart1' === chartRef ? -this._viewHeights.chart1 : this._viewHeights.chart1;
+
+      //高亮联动
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
+        UIManager.RNCombinedChart.Commands.highlightByOthers,
+        [highlight.x, highlight.y, highlight.touchY, manualYOffset]
+      );
     } else {
-      this.setState({...this.state, selectedEntry: JSON.stringify(entry)})
+      //取消选中
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
+        UIManager.RNCombinedChart.Commands.hideHighlight,
+        null
+      );
     }
   }
 
@@ -212,7 +253,7 @@ export default class Combined extends Component {
     );
   }
 
-  //得到图标1的位置，使图标2与之对齐
+  //得到图表1的位置，使图表2与之对齐
   handleChartExtraOffset(event, chartRef) {
     console.log('handleChart1ExtraOffset');
 
@@ -227,6 +268,8 @@ export default class Combined extends Component {
 
   //调整图表2跟随图表1
   handleChartMatrixChange(event, chartRef) {
+    console.log('handleChartMatrixChange');
+
     let {matrix} = event.nativeEvent;
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
@@ -258,13 +301,16 @@ export default class Combined extends Component {
         }}
       >
 
-        {/*<View style={{height: 80}}>*/}
-        {/*<Text> selected entry</Text>*/}
-        {/*<Text> {this.state.selectedEntry}</Text>*/}
-        {/*</View>*/}
+        <View style={{height: 20}}>
+          <Text> selected entry</Text>
+          <Text> {this.state.selectedEntry}</Text>
+        </View>
 
 
         <CombinedChart
+          onLayout={(event) => {
+            this._viewHeights.chart1 = event.nativeEvent.layout.height
+          }}
           ref='chart1'
           style={{flex: 2}}
           data={this.state.data1}
@@ -282,12 +328,15 @@ export default class Combined extends Component {
           // pinchZoom={true}
           rightSelectLabel={this.state.rightSelectLabel}
           bottomSelectLabel={this.state.bottomSelectLabel}
-          onSelect={this.handleSelect.bind(this)}
+          onSelect={(event) => this.handleSelect(event, 'chart2')}
           onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart2')}
           onGetExtraOffset={(event) => this.handleChartExtraOffset(event, 'chart2')}
         />
 
         <CombinedChart
+          onLayout={(event) => {
+            this._viewHeights.chart2 = event.nativeEvent.layout.height
+          }}
           ref='chart2'
           style={{flex: 1}}
           data={this.state.data2}
@@ -299,7 +348,9 @@ export default class Combined extends Component {
           autoScaleMinMaxEnabled={true}
           zoom={this.state.zoom2}
           legend={{enabled: false}}
+          onSelect={(event) => this.handleSelect(event, 'chart1')}
           onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
+          rightSelectLabel={this.state.rightSelectLabel}
         />
       </View>
     );

@@ -11,16 +11,23 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.FloatLabel;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.ChartData;
+import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 import com.github.wuxudong.rncharts.utils.FloatLabelUtil;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -32,6 +39,8 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     public static final int COMMAND_GET_EXTRA_OFFSET = 2;
     public static final int COMMAND_SET_EXTRA_OFFSET = 3;
     public static final int COMMAND_STOP_DECELERATION = 4;
+    public static final int COMMAND_HIGHLIGHT_BY_OTHERS = 5;
+    public static final int COMMAND_HIDE_HIGHLIGHT = 6;
 
     @Override
     public void setYAxis(Chart chart, ReadableMap propMap) {
@@ -176,7 +185,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
-        return MapBuilder.of(
+        Map<String, Integer> map = MapBuilder.of(
                 "changeMatrix",
                 COMMAND_CHANGE_MATRIX,
                 "getExtraOffset",
@@ -184,12 +193,22 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 "setExtraOffset",
                 COMMAND_SET_EXTRA_OFFSET,
                 "stopDeceleration",
-                COMMAND_STOP_DECELERATION);
+                COMMAND_STOP_DECELERATION,
+                "highlightByOthers",
+                COMMAND_HIGHLIGHT_BY_OTHERS,
+                "hideHighlight",
+                COMMAND_HIDE_HIGHLIGHT
+        );
+        if (super.getCommandsMap() != null) {
+            map.putAll(super.getCommandsMap());
+        }
+        return map;
     }
 
     @Override
     public void receiveCommand(View root, int commandId, @Nullable ReadableArray args) {
-        Log.i(TAG, "receiveCommand " + args);
+        super.receiveCommand(root, commandId, args);
+        Log.i(TAG, "receiveCommand " + commandId + " " + args);
 
         if (!Chart.class.isInstance(root)) {
             return;
@@ -208,6 +227,13 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 break;
             case COMMAND_STOP_DECELERATION:
                 stopDeceleration(chart);
+                break;
+            case COMMAND_HIGHLIGHT_BY_OTHERS:
+                highlightByOthers(chart, args);
+                break;
+            case COMMAND_HIDE_HIGHLIGHT:
+                //取消高亮
+                chart.highlightValue(null, false);
                 break;
         }
     }
@@ -291,5 +317,89 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         }
 
         ((BarLineChartBase) chart).stopDeceleration();
+    }
+
+    /**
+     * 根据其他关联图表的选中高亮信息来手动高亮选中
+     *
+     * @param chart 需要操作的图表
+     * @param args  其他图表传过来的高亮参数
+     */
+    private void highlightByOthers(Chart chart, @Nullable ReadableArray args) {
+        float x = (float) args.getDouble(0);
+        float y = (float) args.getDouble(1);
+        float touchY = (float) args.getDouble(2);
+//        int dataIndex = args.getInt(3);
+//        int dataSetIndex = args.getInt(4);
+        float manualYOffset = PixelUtil.toPixelFromDIP((float) args.getDouble(3));//表2和表1Y方向的layout偏差
+
+
+        int[] indexes = getEnableHighlightIndexes(chart);
+        int dataIndex = indexes[0];
+        int dataSetIndex = indexes[1];
+
+        Log.i(TAG, "highlightByOthers " + x + "|" + y + "|" + touchY + "|" + dataIndex +
+                "|" + dataSetIndex + "|" + manualYOffset);
+
+        if (dataSetIndex < 0) {
+            return;
+        }
+        if (CombinedChart.class.isInstance(chart) && dataIndex < 0) {
+            return;
+        }
+
+        float newTouchY = touchY - manualYOffset;
+        Highlight highlight = new Highlight(x, y, dataSetIndex);
+        highlight.setDataIndex(dataIndex);
+        Highlight h1 = chart.getHighlightByTouchPoint(x, newTouchY);
+        highlight.setTouchY(newTouchY);
+        if (null == h1) {
+            highlight.setTouchYValue(0);
+        } else {
+            highlight.setTouchYValue(h1.getTouchYValue());
+        }
+        chart.highlightValues(new Highlight[]{highlight});
+    }
+
+    private int getEnableHighlightDataSetIndex(ChartData chartData) {
+        //TODO 暂时只处理了一个图表一个高亮的情况
+        for (int i = 0, c = chartData.getDataSetCount(); i < c; i++) {
+            IDataSet dataSet = chartData.getDataSetByIndex(i);
+            if (dataSet.isHighlightEnabled()) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * 得到高亮的dataIndex和dataSetIndex
+     *
+     * @param chart
+     * @return [dataIndex, dataSetIndex]
+     */
+    private int[] getEnableHighlightIndexes(Chart chart) {
+        if (!CombinedChart.class.isInstance(chart)) {
+            //不是CombinedChart的情况
+            return new int[]{-1, getEnableHighlightDataSetIndex(chart.getData())};
+        }
+
+        //CombinedChart的情况
+        CombinedChart combinedChart = (CombinedChart) chart;
+        //只处理了一个图标一个高亮的情况
+        CombinedData combinedData = combinedChart.getData();
+        List<? extends ChartData> dataList = combinedData.getAllData();
+        for (int i = 0, c = dataList.size(); i < c; i++) {
+            ChartData chartData = dataList.get(i);
+            int enableHighlightDataSetIndex = getEnableHighlightDataSetIndex(chartData);
+            Log.i(TAG, chartData.getClass().getSimpleName() + "---" + i + "|" +
+                    combinedData.getDataIndex(chartData) + "|" + enableHighlightDataSetIndex);
+            if (enableHighlightDataSetIndex >= 0) {
+                return new int[]{combinedData.getDataIndex(chartData), enableHighlightDataSetIndex};
+            }
+        }
+
+        return new int[]{-1, -1};
     }
 }
