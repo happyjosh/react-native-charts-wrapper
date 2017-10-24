@@ -214,19 +214,14 @@ export default class Combined extends Component {
         }
       ));
 
-    //对其两个图表
-    this.getChart1ExtraOffset();
+    //对齐两个图表
+    this.alignCharts();
   }
-
-  static displayName = 'Combined';
 
   handleSelect(event, chartRef) {
     let {entry, highlight} = event.nativeEvent;
     if (event.nativeEvent && highlight) {
       //选中
-      //TODO 根据桥接代码的获取顺序暂时规定判断Index
-      // let dataIndex = 'chart1' === chartRef ? 1 : 0;
-      // let dataSetIndex = 0;
       let manualYOffset = 'chart1' === chartRef ? -this._viewHeights.chart1 : this._viewHeights.chart1;
 
       //高亮联动
@@ -245,25 +240,66 @@ export default class Combined extends Component {
     }
   }
 
+  _initExtraOffsets = {chart1Left: 0, chart1Right: 0, chart2Left: 0, chart2Right: 0};
+
+  /*对齐图表*/
+  alignCharts() {
+    this.getChart1ExtraOffset();
+  }
+
   getChart1ExtraOffset() {
+    this.getChartExtraOffset('chart1');
+  }
+
+  getChart2ExtraOffset() {
+    this.getChartExtraOffset('chart2');
+  }
+
+  /*得到表1的偏移量,保存，并开始获取图表2的偏移量*/
+  handleChart1ExtraOffset(event) {
+    // this.handleChartExtraOffset(event, 'chart2');
+    let {extraLeftOffset, extraRightOffset} = event.nativeEvent;
+    this._initExtraOffsets.chart1Left = extraLeftOffset;
+    this._initExtraOffsets.chart1Right = extraRightOffset;
+
+    this.getChart2ExtraOffset();
+  }
+
+  /*得到表2的偏移量，开始计算需要调整的偏移量*/
+  handleChart2ExtraOffset(event) {
+    let {extraLeftOffset, extraRightOffset} = event.nativeEvent;
+    this._initExtraOffsets.chart2Left = extraLeftOffset;
+    this._initExtraOffsets.chart2Right = extraRightOffset;
+
+    //临时变量解构，避免调用时代码过长
+    let {chart1Left, chart1Right, chart2Left, chart2Right} = this._initExtraOffsets;
+
+    if (chart2Left < chart1Left) {
+      this.setChartOneExtraOffset('chart2', 'left', chart1Left - chart2Left);
+    } else {
+      this.setChartOneExtraOffset('chart1', 'left', chart2Left - chart1Left);
+    }
+    if (chart2Right < chart1Right) {
+      this.setChartOneExtraOffset('chart2', 'right', chart1Right - chart2Right);
+    } else {
+      this.setChartOneExtraOffset('chart1', 'right', chart2Right - chart1Right);
+    }
+  }
+
+  setChartOneExtraOffset(chartRef, type, offset) {
     UIManager.dispatchViewManagerCommand(
-      findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
-      UIManager.RNCombinedChart.Commands.getExtraOffset,
-      null
+      findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
+      UIManager.RNCombinedChart.Commands.setOneExtraOffset,
+      [type, offset]
     );
   }
 
-  //得到图表1的位置，使图表2与之对齐
-  handleChartExtraOffset(event, chartRef) {
-    console.log('handleChart1ExtraOffset');
-
-    let {extraLeftOffset, extraRightOffset} = event.nativeEvent;
+  getChartExtraOffset(chartRef) {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs[chartRef]), // 找到与NativeUI组件对应的JS组件实例
-      UIManager.RNCombinedChart.Commands.setExtraOffset,
-      [extraLeftOffset, extraRightOffset]
+      UIManager.RNCombinedChart.Commands.getExtraOffset,
+      null
     );
-
   }
 
   //调整图表2跟随图表1
@@ -301,10 +337,10 @@ export default class Combined extends Component {
         }}
       >
 
-        <View style={{height: 20}}>
-          <Text> selected entry</Text>
-          <Text> {this.state.selectedEntry}</Text>
-        </View>
+        {/*<View style={{height: 20}}>*/}
+        {/*<Text> selected entry</Text>*/}
+        {/*<Text> {this.state.selectedEntry}</Text>*/}
+        {/*</View>*/}
 
 
         <CombinedChart
@@ -330,7 +366,7 @@ export default class Combined extends Component {
           bottomSelectLabel={this.state.bottomSelectLabel}
           onSelect={(event) => this.handleSelect(event, 'chart2')}
           onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart2')}
-          onGetExtraOffset={(event) => this.handleChartExtraOffset(event, 'chart2')}
+          onGetExtraOffset={(event) => this.handleChart1ExtraOffset(event)}
         />
 
         <CombinedChart
@@ -346,10 +382,11 @@ export default class Combined extends Component {
           maxVisibleValueCount={16}//屏幕内放大到多少数量时可以显示值
           doubleTapToZoomEnabled={false}
           autoScaleMinMaxEnabled={true}
-          zoom={this.state.zoom2}
+          // zoom={this.state.zoom2}
           legend={{enabled: false}}
           onSelect={(event) => this.handleSelect(event, 'chart1')}
           onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
+          onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
           rightSelectLabel={this.state.rightSelectLabel}
         />
       </View>

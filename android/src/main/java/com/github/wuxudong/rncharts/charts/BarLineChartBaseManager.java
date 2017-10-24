@@ -37,7 +37,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
 
     public static final int COMMAND_CHANGE_MATRIX = 1;
     public static final int COMMAND_GET_EXTRA_OFFSET = 2;
-    public static final int COMMAND_SET_EXTRA_OFFSET = 3;
+    public static final int COMMAND_SET_ONE_EXTRA_OFFSET = 3;
     public static final int COMMAND_STOP_DECELERATION = 4;
     public static final int COMMAND_HIGHLIGHT_BY_OTHERS = 5;
     public static final int COMMAND_HIDE_HIGHLIGHT = 6;
@@ -190,8 +190,8 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 COMMAND_CHANGE_MATRIX,
                 "getExtraOffset",
                 COMMAND_GET_EXTRA_OFFSET,
-                "setExtraOffset",
-                COMMAND_SET_EXTRA_OFFSET,
+                "setOneExtraOffset",
+                COMMAND_SET_ONE_EXTRA_OFFSET,
                 "stopDeceleration",
                 COMMAND_STOP_DECELERATION,
                 "highlightByOthers",
@@ -222,8 +222,8 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
             case COMMAND_GET_EXTRA_OFFSET:
                 responseExtraOffset(chart);
                 break;
-            case COMMAND_SET_EXTRA_OFFSET:
-                setExtraOffset(chart, args);
+            case COMMAND_SET_ONE_EXTRA_OFFSET:
+                setOneExtraOffset(chart, args);
                 break;
             case COMMAND_STOP_DECELERATION:
                 stopDeceleration(chart);
@@ -284,8 +284,8 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         Log.i(TAG, "responseExtraOffset");
         WritableMap event = Arguments.createMap();
 
-        event.putDouble("extraLeftOffset", chart.getExtraLeftOffset());
-        event.putDouble("extraRightOffset", chart.getExtraRightOffset());
+        event.putDouble("extraLeftOffset", chart.getViewPortHandler().offsetLeft());
+        event.putDouble("extraRightOffset", chart.getViewPortHandler().offsetRight());
 
         ReactContext reactContext = (ReactContext) chart.getContext();
         reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
@@ -295,15 +295,31 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     }
 
     /**
-     * 设置位置
+     * 设置某个方向的偏移
      *
      * @param chart
      * @param args
      */
-    private void setExtraOffset(Chart chart, @Nullable ReadableArray args) {
-        Log.i(TAG, "setExtraOffset " + args);
-        chart.setExtraLeftOffset((float) args.getDouble(0));
-        chart.setExtraLeftOffset((float) args.getDouble(1));
+    private void setOneExtraOffset(Chart chart, @Nullable ReadableArray args) {
+        Log.i(TAG, "setOneExtraOffset " + args);
+
+        String type = args.getString(0);
+        float offset = (float) args.getDouble(1);
+
+        if (type == null) {
+            return;
+        }
+
+        switch (type) {
+            case "left":
+                chart.setExtraLeftOffset(PixelUtil.toDIPFromPixel(offset));
+                break;
+            case "right":
+                chart.setExtraRightOffset(PixelUtil.toDIPFromPixel(offset));
+                break;
+        }
+
+        chart.postInvalidate();
     }
 
     /**
