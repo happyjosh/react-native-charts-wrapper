@@ -245,6 +245,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 //拖拽和缩放时回调
                 .put("topMatrixChange", MapBuilder.of("registrationName", "onMatrixChange"))
                 .put("topGetExtraOffset", MapBuilder.of("registrationName", "onGetExtraOffset"))
+                .put("topSingleTapped", MapBuilder.of("registrationName", "onSingleTapped"))
                 .build();
     }
 

@@ -367,6 +367,9 @@ export default class Combined extends Component {
           onSelect={(event) => this.handleSelect(event, 'chart2')}
           onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart2')}
           onGetExtraOffset={(event) => this.handleChart1ExtraOffset(event)}
+          onSingleTapped={(event)=>{
+            console.log('click');
+          }}
         />
 
         <CombinedChart

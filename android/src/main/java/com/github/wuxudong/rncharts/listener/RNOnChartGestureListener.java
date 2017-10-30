@@ -51,7 +51,17 @@ public class RNOnChartGestureListener implements OnChartGestureListener {
 
     @Override
     public void onChartSingleTapped(MotionEvent me) {
+        Log.i(TAG, "onChartSingleTapped");
+        if (mWeakChart == null) {
+            return;
+        }
+        Chart chart = mWeakChart.get();
 
+        ReactContext reactContext = (ReactContext) chart.getContext();
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                chart.getId(),
+                "topSingleTapped",
+                null);
     }
 
     @Override
