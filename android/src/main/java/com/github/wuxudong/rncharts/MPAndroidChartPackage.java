@@ -23,7 +23,7 @@ public class MPAndroidChartPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList();
+        return Arrays.<NativeModule>asList(new BindChartModule(reactContext));
     }
 
     @Override

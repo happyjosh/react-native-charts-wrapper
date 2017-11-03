@@ -12,6 +12,7 @@ import {CombinedChart} from 'react-native-charts-wrapper';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import {barData, bottomLineData, candleData, line2Data, lineData} from "./testData";
+import ChartBinder from './chartBinder'
 
 const styles = StyleSheet.create({
   container: {
@@ -215,7 +216,15 @@ export default class Combined extends Component {
       ));
 
     //对齐两个图表
-    this.alignCharts();
+    // this.alignCharts();
+
+    setTimeout(() => {
+      console.log('-------------------begin--------------------');
+      // console.log(findNodeHandle(this.refs['chart1']));
+      const manualYOffset = this._viewHeights.chart1;
+      ChartBinder.bindChart(findNodeHandle(this.refs['chart1']), findNodeHandle(this.refs['chart2']), manualYOffset);
+      console.log('-------------------end--------------------');
+    }, 500);
   }
 
   handleSelect(event, chartRef) {
@@ -364,10 +373,11 @@ export default class Combined extends Component {
           // pinchZoom={true}
           rightSelectLabel={this.state.rightSelectLabel}
           bottomSelectLabel={this.state.bottomSelectLabel}
-          onSelect={(event) => this.handleSelect(event, 'chart2')}
-          onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart2')}
-          onGetExtraOffset={(event) => this.handleChart1ExtraOffset(event)}
-          onSingleTapped={(event)=>{
+          onSelect={(event) => console.log(event.nativeEvent)}
+          // onSelect={(event) => this.handleSelect(event, 'chart2')}
+          // onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart2')}
+          // onGetExtraOffset={(event) => this.handleChart1ExtraOffset(event)}
+          onSingleTapped={(event) => {
             console.log('click');
           }}
         />
@@ -387,9 +397,9 @@ export default class Combined extends Component {
           autoScaleMinMaxEnabled={true}
           // zoom={this.state.zoom2}
           legend={{enabled: false}}
-          onSelect={(event) => this.handleSelect(event, 'chart1')}
-          onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
-          onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
+          // onSelect={(event) => this.handleSelect(event, 'chart1')}
+          // onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
+          // onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
           rightSelectLabel={this.state.rightSelectLabel}
         />
       </View>

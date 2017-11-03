@@ -1,13 +1,9 @@
 package com.github.wuxudong.rncharts.listener;
 
-import android.graphics.Matrix;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.listener.ChartTouchListener;
@@ -71,39 +67,10 @@ public class RNOnChartGestureListener implements OnChartGestureListener {
 
     @Override
     public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
-        onMatrixChange();
     }
 
     @Override
     public void onChartTranslate(MotionEvent me, float dX, float dY) {
-        onMatrixChange();
     }
 
-    public void onMatrixChange() {
-        Log.i(TAG, "onMatrixChange");
-        if (mWeakChart == null) {
-            return;
-        }
-
-        Chart chart = mWeakChart.get();
-
-        Matrix srcMatrix;
-        float[] srcVals = new float[9];
-
-        srcMatrix = chart.getViewPortHandler().getMatrixTouch();
-        srcMatrix.getValues(srcVals);
-
-        WritableArray dstVals = Arguments.createArray();
-        for (int i = 0; i < srcVals.length; i++) {
-            dstVals.pushDouble(srcVals[i]);
-        }
-
-        WritableMap event = Arguments.createMap();
-        event.putArray("matrix", dstVals);
-        ReactContext reactContext = (ReactContext) chart.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-                chart.getId(),
-                "topMatrixChange",
-                event);
-    }
 }
