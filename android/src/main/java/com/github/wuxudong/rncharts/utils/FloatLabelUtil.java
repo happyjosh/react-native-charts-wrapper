@@ -41,6 +41,21 @@ public class FloatLabelUtil {
         }
         floatLabel.getLabelText().setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 
+        int marginLeft = 0, marginTop = 0, marginRight = 0, marginBottom = 0;
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "marginLeft")) {
+            marginLeft = (int) PixelUtil.toPixelFromDIP(propMap.getDouble("marginLeft"));
+        }
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "marginTop")) {
+            marginTop = (int) PixelUtil.toPixelFromDIP(propMap.getDouble("marginTop"));
+        }
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "marginRight")) {
+            marginRight = (int) PixelUtil.toPixelFromDIP(propMap.getDouble("marginRight"));
+        }
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "marginBottom")) {
+            marginBottom = (int) PixelUtil.toPixelFromDIP(propMap.getDouble("marginBottom"));
+        }
+        floatLabel.setPadding(marginLeft, marginTop, marginRight, marginBottom);
+
         return floatLabel;
     }
 
