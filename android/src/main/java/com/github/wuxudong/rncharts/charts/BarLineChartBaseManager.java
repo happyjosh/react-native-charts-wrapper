@@ -31,6 +31,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     public static final int COMMAND_GET_EXTRA_OFFSET = 2;
     public static final int COMMAND_SET_ONE_EXTRA_OFFSET = 3;
     public static final int COMMAND_STOP_DECELERATION = 4;
+    public static final int COMMAND_RESET_CHART = 5;
 
     @Override
     public void setYAxis(Chart chart, ReadableMap propMap) {
@@ -181,7 +182,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 "setOneExtraOffset",
                 COMMAND_SET_ONE_EXTRA_OFFSET,
                 "stopDeceleration",
-                COMMAND_STOP_DECELERATION
+                COMMAND_STOP_DECELERATION,
+                "resetChart",
+                COMMAND_RESET_CHART
         );
         if (super.getCommandsMap() != null) {
             map.putAll(super.getCommandsMap());
@@ -208,6 +211,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 break;
             case COMMAND_STOP_DECELERATION:
                 stopDeceleration(chart);
+                break;
+            case COMMAND_RESET_CHART:
+                resetChart(chart);
                 break;
         }
     }
@@ -279,5 +285,29 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         }
 
         ((BarLineChartBase) chart).stopDeceleration();
+    }
+
+    /**
+     * 使图表恢复初始化
+     *
+     * @param chart
+     */
+    private void resetChart(Chart chart) {
+        Log.i(TAG,"resetChart");
+        if (!BarLineChartBase.class.isInstance(chart)) {
+            return;
+        }
+
+        BarLineChartBase barLineChartBase = (BarLineChartBase) chart;
+
+        barLineChartBase.clear();
+        barLineChartBase.fitScreen();
+        barLineChartBase.highlightValue(null);
+        barLineChartBase.stopDeceleration();
+        barLineChartBase.clearAllViewportJobs();
+
+        barLineChartBase.getXAxis().removeAllLimitLines();
+        barLineChartBase.getAxisLeft().removeAllLimitLines();
+        barLineChartBase.getAxisRight().removeAllLimitLines();
     }
 }
