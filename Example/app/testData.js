@@ -59,4 +59,18 @@ export const line2Data = candleData.map(item => item.open);
 export const barData = candleData.map(item => {
   return {y: (item.close - 100)};
 })
-export const bottomLineData = barData.map(item => item.y/2);
+export const bottomLineData = barData.map(item => item.y / 2);
+
+
+const getTimes = () => {
+  let times = [];
+  let time = Date.now();
+  for (let i = 0; i < candleData.length; i++) {
+    time += 60 * 60 * 1000;
+    times.push(time);
+  }
+
+  return times;
+}
+
+export const times = getTimes();

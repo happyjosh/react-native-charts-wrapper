@@ -11,7 +11,7 @@ import {
 import {CombinedChart} from 'react-native-charts-wrapper';
 import update from 'immutability-helper';
 import _ from 'lodash';
-import {barData, bottomLineData, candleData, line2Data, lineData} from "./testData";
+import {barData, bottomLineData, candleData, line2Data, lineData, times} from "./testData";
 import ChartBinder from './chartBinder'
 
 const styles = StyleSheet.create({
@@ -151,8 +151,12 @@ export default class Combined extends Component {
               drawGridLines: true,
               position: 'BOTTOM',
               labelCount: 8,
-              labelCountForce: true,
+              labelCountForce: false,
               textSize: 10,
+              valueFormatter: {
+                type: 'simpleTime',
+                values: times
+              }
             }
           },
           yAxis1: {
@@ -219,11 +223,9 @@ export default class Combined extends Component {
     // this.alignCharts();
 
     setTimeout(() => {
-      console.log('-------------------begin--------------------');
       // console.log(findNodeHandle(this.refs['chart1']));
       const manualYOffset = this._viewHeights.chart1;
       ChartBinder.bindChart(findNodeHandle(this.refs['chart1']), findNodeHandle(this.refs['chart2']), manualYOffset);
-      console.log('-------------------end--------------------');
     }, 500);
   }
 

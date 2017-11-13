@@ -25,6 +25,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.wuxudong.rncharts.data.DataExtract;
+import com.github.wuxudong.rncharts.formatter.TimeIndexAxisValueFormatter;
 import com.github.wuxudong.rncharts.markers.RNRectangleMarkerView;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 
@@ -372,8 +373,15 @@ public abstract class ChartBaseManager<T extends Chart, U extends Entry> extends
             axis.setLabelCount(propMap.getInt("labelCount"), labelCountForce);
         }
 
-        // formatting
-        if (BridgeUtils.validate(propMap, ReadableType.String, "valueFormatter")) {
+        if (BridgeUtils.validate(propMap, ReadableType.Map, "valueFormatter")) {
+            //扩展了其他字段
+            ReadableMap formatterType = propMap.getMap("valueFormatter");
+            if (BridgeUtils.validate(formatterType, ReadableType.String, "type") &&
+                    BridgeUtils.validate(formatterType, ReadableType.Array, "values")) {
+                axis.setValueFormatter(new TimeIndexAxisValueFormatter(formatterType.getString("type"),
+                        BridgeUtils.convertToLongArray(formatterType.getArray("values"))));
+            }
+        } else if (BridgeUtils.validate(propMap, ReadableType.String, "valueFormatter")) {
             String valueFormatter = propMap.getString("valueFormatter");
 
             if ("largeValue".equals(valueFormatter)) {
@@ -384,7 +392,8 @@ public abstract class ChartBaseManager<T extends Chart, U extends Entry> extends
                 axis.setValueFormatter(new CustomFormatter(valueFormatter));
             }
         } else if (BridgeUtils.validate(propMap, ReadableType.Array, "valueFormatter")) {
-            axis.setValueFormatter(new IndexAxisValueFormatter(BridgeUtils.convertToStringArray(propMap.getArray("valueFormatter"))));
+            axis.setValueFormatter(new IndexAxisValueFormatter(
+                    BridgeUtils.convertToStringArray(propMap.getArray("valueFormatter"))));
         }
 
         if (BridgeUtils.validate(propMap, ReadableType.Boolean, "centerAxisLabels")) {

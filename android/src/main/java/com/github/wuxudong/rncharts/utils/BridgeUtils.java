@@ -36,6 +36,19 @@ public class BridgeUtils {
         return array;
     }
 
+    public static long[] convertToLongArray(ReadableArray readableArray) {
+        long[] array = new long[readableArray.size()];
+
+        for (int i = 0; i < readableArray.size(); i++) {
+            if (!ReadableType.Number.equals(readableArray.getType(i))) {
+                throw new IllegalArgumentException("Expecting array of numbers");
+            }
+            array[i] = (long) readableArray.getDouble(i);
+        }
+
+        return array;
+    }
+
     public static String[] convertToStringArray(ReadableArray readableArray) {
         String[] array = new String[readableArray.size()];
 
