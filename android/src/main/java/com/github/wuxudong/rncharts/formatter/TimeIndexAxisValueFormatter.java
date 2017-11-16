@@ -87,29 +87,60 @@ public class TimeIndexAxisValueFormatter implements IAxisValueFormatter, IPrevio
 
         long previousTimestamp = mValues[previousIndex];
         long timestamp = mValues[index];
-        if ("simpleTime".equals(mFormatType)) {
-            Calendar previousCalender = Calendar.getInstance(TIME_ZONE);
-            previousCalender.setTimeInMillis(previousTimestamp);
 
-            Calendar calender = Calendar.getInstance(TIME_ZONE);
-            calender.setTimeInMillis(timestamp);
-
-            Log.i(TAG, previousCalender.get(Calendar.YEAR) + "-" + calender.get(Calendar.YEAR) + "-" +
-                    previousCalender.get(Calendar.MONTH) + "-" + calender.get(Calendar.MONTH) + "-" +
-                    previousCalender.get(Calendar.DAY_OF_MONTH) + "-" + calender.get(Calendar.DAY_OF_MONTH));
-
-            if (previousCalender.get(Calendar.YEAR) != calender.get(Calendar.YEAR) ||
-                    previousCalender.get(Calendar.MONTH) != calender.get(Calendar.MONTH) ||
-                    previousCalender.get(Calendar.DAY_OF_MONTH) != calender.get(Calendar.DAY_OF_MONTH)) {
-                //和上一个坐标轴不是同一天
-                SimpleDateFormat newSimpleDateFormat = new SimpleDateFormat("MM-dd HH:mm");
-                newSimpleDateFormat.setTimeZone(TIME_ZONE);
-                return newSimpleDateFormat.format(timestamp);
-            }
+        switch (mFormatType){
+            case "simpleTime":
+                return getSimpleTimeValue(previousTimestamp,timestamp);
+            case "simpleDate":
+                return getSimpleDateValue(previousTimestamp,timestamp);
         }
 
 
         return mSimpleDateFormat.format(timestamp);
+    }
+
+    private String getSimpleTimeValue(long previousTimestamp,long timestamp){
+        if (!isSameDay(previousTimestamp,timestamp)) {
+            //和上一个坐标轴不是同一天
+            SimpleDateFormat newSimpleDateFormat = new SimpleDateFormat("MM-dd HH:mm");
+            newSimpleDateFormat.setTimeZone(TIME_ZONE);
+            return newSimpleDateFormat.format(timestamp);
+        }
+
+        return mSimpleDateFormat.format(timestamp);
+    }
+
+
+    private String getSimpleDateValue(long previousTimestamp,long timestamp){
+        if (!isSameDay(previousTimestamp,timestamp)) {
+            //和上一个坐标轴不是同一天
+            SimpleDateFormat newSimpleDateFormat = new SimpleDateFormat("MM-dd");
+            newSimpleDateFormat.setTimeZone(TIME_ZONE);
+            return newSimpleDateFormat.format(timestamp);
+        }
+
+        return "";
+    }
+
+    private boolean isSameDay(long previousTimestamp,long timestamp){
+        Calendar previousCalender = Calendar.getInstance(TIME_ZONE);
+        previousCalender.setTimeInMillis(previousTimestamp);
+
+        Calendar calender = Calendar.getInstance(TIME_ZONE);
+        calender.setTimeInMillis(timestamp);
+
+        Log.i(TAG,"isSameDay:" +previousCalender.get(Calendar.YEAR) + "-" + calender.get(Calendar.YEAR) + "-" +
+                previousCalender.get(Calendar.MONTH) + "-" + calender.get(Calendar.MONTH) + "-" +
+                previousCalender.get(Calendar.DAY_OF_MONTH) + "-" + calender.get(Calendar.DAY_OF_MONTH));
+
+        if (previousCalender.get(Calendar.YEAR) == calender.get(Calendar.YEAR) &&
+                previousCalender.get(Calendar.MONTH) == calender.get(Calendar.MONTH) &&
+                previousCalender.get(Calendar.DAY_OF_MONTH) == calender.get(Calendar.DAY_OF_MONTH)) {
+            //和上一个坐标轴是同一天
+            return true;
+        }
+
+        return false;
     }
 
     public long[] getValues() {

@@ -66,7 +66,7 @@ const getTimes = () => {
   let times = [];
   let time = Date.now();
   for (let i = 0; i < candleData.length; i++) {
-    time += 60 * 60 * 1000;
+    time += 4 * 60 * 60 * 1000;
     times.push(time);
   }
 

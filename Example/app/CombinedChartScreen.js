@@ -154,7 +154,7 @@ export default class Combined extends Component {
               labelCountForce: false,
               textSize: 10,
               valueFormatter: {
-                type: 'simpleTime',
+                type: 'simpleDate',
                 values: times
               }
             }
