@@ -338,6 +338,25 @@ export default class Combined extends Component {
     );
   }
 
+  test = 0;
+
+  testUpdateLastEntry() {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
+      UIManager.RNCombinedChart.Commands.updateLastEntry,
+      [{
+        candleEntries: [
+          {
+            shadowH: 92.78,
+            shadowL: 89.47,
+            open: 92.72,
+            close: 90.32
+          }
+        ]
+      }]
+    );
+  }
+
   render() {
     return (
       <View
@@ -403,6 +422,7 @@ export default class Combined extends Component {
           // onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
           // onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
           rightSelectLabel={this.state.rightSelectLabel}
+          onSingleTapped={this.testUpdateLastEntry.bind(this)}
         />
       </View>
     );

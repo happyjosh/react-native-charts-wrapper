@@ -32,6 +32,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     public static final int COMMAND_SET_ONE_EXTRA_OFFSET = 3;
     public static final int COMMAND_STOP_DECELERATION = 4;
     public static final int COMMAND_RESET_CHART = 5;
+    public static final int COMMAND_UPDATE_LAST_ENTRY = 6;
 
     @Override
     public void setYAxis(Chart chart, ReadableMap propMap) {
@@ -184,7 +185,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 "stopDeceleration",
                 COMMAND_STOP_DECELERATION,
                 "resetChart",
-                COMMAND_RESET_CHART
+                COMMAND_RESET_CHART,
+                "updateLastEntry",
+                COMMAND_UPDATE_LAST_ENTRY
         );
         if (super.getCommandsMap() != null) {
             map.putAll(super.getCommandsMap());
@@ -214,6 +217,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 break;
             case COMMAND_RESET_CHART:
                 resetChart(chart);
+                break;
+            case COMMAND_UPDATE_LAST_ENTRY:
+                updateLastEntry(chart, args.getMap(0));
                 break;
         }
     }
@@ -293,7 +299,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
      * @param chart
      */
     private void resetChart(Chart chart) {
-        Log.i(TAG,"resetChart");
+        Log.i(TAG, "resetChart");
         if (!BarLineChartBase.class.isInstance(chart)) {
             return;
         }
@@ -309,5 +315,15 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         barLineChartBase.getXAxis().removeAllLimitLines();
         barLineChartBase.getAxisLeft().removeAllLimitLines();
         barLineChartBase.getAxisRight().removeAllLimitLines();
+    }
+
+    /**
+     * 更新最后一个元素(需要对应的子类实现)
+     *
+     * @param chart
+     * @param readableMap
+     */
+    protected void updateLastEntry(Chart chart, ReadableMap readableMap) {
+
     }
 }
