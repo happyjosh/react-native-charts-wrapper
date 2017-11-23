@@ -399,6 +399,13 @@ public abstract class ChartBaseManager<T extends Chart, U extends Entry> extends
         if (BridgeUtils.validate(propMap, ReadableType.Boolean, "centerAxisLabels")) {
             axis.setCenterAxisLabels(propMap.getBoolean("centerAxisLabels"));
         }
+
+        if(BridgeUtils.validate(propMap,ReadableType.Number,"spaceMin")){
+            axis.setSpaceMin((float) propMap.getDouble("spaceMin"));
+        }
+        if(BridgeUtils.validate(propMap,ReadableType.Number,"spaceMax")){
+            axis.setSpaceMax((float) propMap.getDouble("spaceMax"));
+        }
     }
 
     /**

@@ -156,7 +156,9 @@ export default class Combined extends Component {
               valueFormatter: {
                 type: 'simpleDate',
                 values: times
-              }
+              },
+              spaceMin: 0.5,
+              spaceMax: 1.5
             }
           },
           yAxis1: {
@@ -188,6 +190,8 @@ export default class Combined extends Component {
               labelCount: 8,
               labelCountForce: true,
               textSize: 10,
+              spaceMin: 0.5,
+              spaceMax: 1.5
             }
           },
           yAxis2: {
