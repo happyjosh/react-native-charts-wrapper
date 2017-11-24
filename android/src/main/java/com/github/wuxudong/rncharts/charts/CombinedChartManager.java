@@ -94,7 +94,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 ReadableMap lineEntry = lineEntries.getMap(i);
                 float lineValue = (float) lineEntry.getDouble("y");
                 IDataSet dataSet = lineData.getDataSetByIndex(i);
-                if (dataSet == null) {
+                if (dataSet == null || dataSet.getEntryCount() <= 0) {
                     continue;
                 }
                 dataSet.getEntryForIndex(dataSet.getEntryCount() - 1).setY(lineValue);
@@ -110,7 +110,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 ReadableMap lineEntry = barEntries.getMap(i);
                 float barValue = (float) lineEntry.getDouble("y");
                 IDataSet dataSet = barData.getDataSetByIndex(i);
-                if (dataSet == null) {
+                if (dataSet == null|| dataSet.getEntryCount() <= 0) {
                     continue;
                 }
                 dataSet.getEntryForIndex(dataSet.getEntryCount() - 1).setY(barValue);
@@ -129,7 +129,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 float high = (float) lineEntry.getDouble("shadowH");
                 float low = (float) lineEntry.getDouble("shadowL");
                 ICandleDataSet dataSet = candleData.getDataSetByIndex(i);
-                if (dataSet == null) {
+                if (dataSet == null|| dataSet.getEntryCount() <= 0) {
                     continue;
                 }
                 CandleEntry candleEntry = dataSet.getEntryForIndex(dataSet.getEntryCount() - 1);
