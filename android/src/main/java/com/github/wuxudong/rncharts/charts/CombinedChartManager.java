@@ -82,9 +82,14 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
 
         CombinedData combinedData = combinedChart.getData();
 
-        if (BridgeUtils.validate(readableMap, ReadableType.Array, "lineEntries")) {
+        if (combinedData == null) {
+            return;
+        }
+
+        LineData lineData = combinedData.getLineData();
+        if (BridgeUtils.validate(readableMap, ReadableType.Array, "lineEntries") &&
+                lineData != null) {
             ReadableArray lineEntries = readableMap.getArray("lineEntries");
-            LineData lineData = combinedData.getLineData();
             for (int i = 0; i < lineEntries.size(); i++) {
                 ReadableMap lineEntry = lineEntries.getMap(i);
                 float lineValue = (float) lineEntry.getDouble("y");
@@ -97,9 +102,10 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
             lineData.notifyDataChanged();
         }
 
-        if (BridgeUtils.validate(readableMap, ReadableType.Array, "barEntries")) {
+        BarData barData = combinedData.getBarData();
+        if (BridgeUtils.validate(readableMap, ReadableType.Array, "barEntries") &&
+                barData != null) {
             ReadableArray barEntries = readableMap.getArray("barEntries");
-            BarData barData = combinedData.getBarData();
             for (int i = 0; i < barEntries.size(); i++) {
                 ReadableMap lineEntry = barEntries.getMap(i);
                 float barValue = (float) lineEntry.getDouble("y");
@@ -112,9 +118,10 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
             barData.notifyDataChanged();
         }
 
-        if (BridgeUtils.validate(readableMap, ReadableType.Array, "candleEntries")) {
+        CandleData candleData = combinedData.getCandleData();
+        if (BridgeUtils.validate(readableMap, ReadableType.Array, "candleEntries") &&
+                candleData != null) {
             ReadableArray candleEntries = readableMap.getArray("candleEntries");
-            CandleData candleData = combinedData.getCandleData();
             for (int i = 0; i < candleEntries.size(); i++) {
                 ReadableMap lineEntry = candleEntries.getMap(i);
                 float open = (float) lineEntry.getDouble("open");

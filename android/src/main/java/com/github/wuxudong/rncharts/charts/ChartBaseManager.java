@@ -303,6 +303,7 @@ public abstract class ChartBaseManager<T extends Chart, U extends Entry> extends
         }
 
         // limit lines
+        axis.removeAllLimitLines();
         if (BridgeUtils.validate(propMap, ReadableType.Array, "limitLines")) {
             ReadableArray limitLines = propMap.getArray("limitLines");
 
