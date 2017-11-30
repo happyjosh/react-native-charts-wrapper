@@ -135,6 +135,13 @@ export default class Combined extends Component {
         paddingRight: 5,
         paddingBottom: 2,
       },
+      zoom: {
+        scaleX: candleData.length / (8 * 5),
+        scaleY: 1,
+        xValue: candleData.length,
+        yValue: 1,
+        axisDependency: 'RIGHT'
+      }
       // xAxis1: {},
       // yAxis1: {},
       // xAxis2: {},
@@ -361,6 +368,51 @@ export default class Combined extends Component {
     );
   }
 
+  _addCount = 0;
+
+  nowTime = Date.now();
+
+  testAddNewEntry() {
+    this._addCount++;
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
+      UIManager.RNCombinedChart.Commands.addNewEntry,
+      [{
+        data: [{
+          candleEntries: [
+            {
+              shadowH: 92.78,
+              shadowL: 89.47,
+              open: 92.72,
+              close: 90.32
+            }
+          ]
+        }, {
+          candleEntries: [
+            {
+              shadowH: 95.08,
+              shadowL: 87.47,
+              open: 92.72,
+              close: 91.32
+            }
+          ]
+        }],
+        timestamp: [this.nowTime + 4 * 60 * 60 * 1000,
+          this.nowTime + 8 * 60 * 60 * 1000]
+      }]
+    );
+    this.nowTime += 8 * 60 * 60 * 1000;
+    // this.refs['chart1'].setNativeProps({
+    //   zoom: {
+    //     scaleX: (candleData.length + this._addCount) / (8 * 5),
+    //     scaleY: 1,
+    //     xValue: candleData.length + this._addCount,
+    //     yValue: 1,
+    //     axisDependency: 'RIGHT'
+    //   }
+    // });
+  }
+
   render() {
     return (
       <View
@@ -393,6 +445,7 @@ export default class Combined extends Component {
           maxVisibleValueCount={16}//屏幕内放大到多少数量时可以显示值
           autoScaleMinMaxEnabled={true}
           doubleTapToZoomEnabled={false}
+          zoom={this.state.zoom}
           // zoom={{scaleX: 2, scaleY: 1, xValue: 1, yValue: 1}}//默认缩放
           scaleYEnabled={false}
           // pinchZoom={true}
@@ -421,12 +474,13 @@ export default class Combined extends Component {
           doubleTapToZoomEnabled={false}
           autoScaleMinMaxEnabled={true}
           // zoom={this.state.zoom2}
+          zoom={this.state.zoom}
           legend={{enabled: false}}
           // onSelect={(event) => this.handleSelect(event, 'chart1')}
           // onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
           // onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
           rightSelectLabel={this.state.rightSelectLabel}
-          onSingleTapped={this.testUpdateLastEntry.bind(this)}
+          onSingleTapped={this.testAddNewEntry.bind(this)}
         />
       </View>
     );

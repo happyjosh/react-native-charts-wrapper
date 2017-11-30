@@ -33,6 +33,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     public static final int COMMAND_STOP_DECELERATION = 4;
     public static final int COMMAND_RESET_CHART = 5;
     public static final int COMMAND_UPDATE_LAST_ENTRY = 6;
+    public static final int COMMAND_ADD_NEW_ENTRY = 7;
 
     @Override
     public void setYAxis(Chart chart, ReadableMap propMap) {
@@ -187,7 +188,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 "resetChart",
                 COMMAND_RESET_CHART,
                 "updateLastEntry",
-                COMMAND_UPDATE_LAST_ENTRY
+                COMMAND_UPDATE_LAST_ENTRY,
+                "addNewEntry",
+                COMMAND_ADD_NEW_ENTRY
         );
         if (super.getCommandsMap() != null) {
             map.putAll(super.getCommandsMap());
@@ -220,6 +223,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 break;
             case COMMAND_UPDATE_LAST_ENTRY:
                 updateLastEntry(chart, args.getMap(0));
+                break;
+            case COMMAND_ADD_NEW_ENTRY:
+                addNewEntry(chart, args.getMap(0));
                 break;
         }
     }
@@ -324,6 +330,16 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
      * @param readableMap
      */
     protected void updateLastEntry(Chart chart, ReadableMap readableMap) {
+
+    }
+
+    /**
+     * 添加一个新元素
+     *
+     * @param chart
+     * @param readableMap
+     */
+    protected void addNewEntry(Chart chart, ReadableMap readableMap) {
 
     }
 }
