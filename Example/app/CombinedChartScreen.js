@@ -458,6 +458,9 @@ export default class Combined extends Component {
           onSingleTapped={(event) => {
             console.log('click');
           }}
+          onLoadMore={() =>
+            console.log('lllllloadmore')
+          }
         />
 
         <CombinedChart

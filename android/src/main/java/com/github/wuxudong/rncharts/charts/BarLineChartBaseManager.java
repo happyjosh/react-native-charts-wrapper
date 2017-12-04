@@ -238,6 +238,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 .put("topMatrixChange", MapBuilder.of("registrationName", "onMatrixChange"))
                 .put("topGetExtraOffset", MapBuilder.of("registrationName", "onGetExtraOffset"))
                 .put("topSingleTapped", MapBuilder.of("registrationName", "onSingleTapped"))
+                .put("topLoadMore", MapBuilder.of("registrationName", "onLoadMore"))
                 .build();
     }
 
