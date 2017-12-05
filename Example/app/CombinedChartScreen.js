@@ -30,38 +30,6 @@ export default class Combined extends Component {
     super();
     this.state = {
       data1: {
-        lineData: {
-          dataSets: [
-            {
-              values: lineData,
-              label: 'Sine function',
-
-              config: {
-                drawValues: false,
-                colors: [processColor('#ff9500')],
-                mode: "CUBIC_BEZIER",
-                drawCircles: false,
-                lineWidth: 1,
-                axisDependency: 'RIGHT',
-                highlightEnabled: false,
-              }
-            },
-            {
-              values: line2Data,
-              label: 'Sine function',
-
-              config: {
-                drawValues: false,
-                colors: [processColor('#007aff')],
-                mode: "CUBIC_BEZIER",
-                drawCircles: false,
-                lineWidth: 1,
-                axisDependency: 'RIGHT',
-                highlightEnabled: false,
-              }
-            }
-          ],
-        },
         candleData: {
           dataSets: [{
             values: candleData,
@@ -413,6 +381,20 @@ export default class Combined extends Component {
     // });
   }
 
+  testLoadMore = () => {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
+      UIManager.RNCombinedChart.Commands.loadMoreComplete,
+      [{
+        data: {
+          candleEntries: [candleData.concat()],
+        },
+        timestamp: candleData.map(item => this.nowTime)
+      }]
+    );
+
+  }
+
   render() {
     return (
       <View
@@ -458,9 +440,7 @@ export default class Combined extends Component {
           onSingleTapped={(event) => {
             console.log('click');
           }}
-          onLoadMore={() =>
-            console.log('lllllloadmore')
-          }
+          onLoadMore={this.testLoadMore.bind(this)}
         />
 
         <CombinedChart
@@ -483,7 +463,7 @@ export default class Combined extends Component {
           // onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
           // onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
           rightSelectLabel={this.state.rightSelectLabel}
-          onSingleTapped={this.testAddNewEntry.bind(this)}
+          onSingleTapped={this.testLoadMore.bind(this)}
         />
       </View>
     );

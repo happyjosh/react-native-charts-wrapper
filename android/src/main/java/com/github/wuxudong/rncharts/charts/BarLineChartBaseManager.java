@@ -34,6 +34,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     public static final int COMMAND_RESET_CHART = 5;
     public static final int COMMAND_UPDATE_LAST_ENTRY = 6;
     public static final int COMMAND_ADD_NEW_ENTRY = 7;
+    public static final int COMMAND_LOAD_MORE_COMPLETE = 8;
 
     @Override
     public void setYAxis(Chart chart, ReadableMap propMap) {
@@ -190,7 +191,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 "updateLastEntry",
                 COMMAND_UPDATE_LAST_ENTRY,
                 "addNewEntry",
-                COMMAND_ADD_NEW_ENTRY
+                COMMAND_ADD_NEW_ENTRY,
+                "loadMoreComplete",
+                COMMAND_LOAD_MORE_COMPLETE
         );
         if (super.getCommandsMap() != null) {
             map.putAll(super.getCommandsMap());
@@ -201,7 +204,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     @Override
     public void receiveCommand(View root, int commandId, @Nullable ReadableArray args) {
         super.receiveCommand(root, commandId, args);
-        Log.i(TAG, "receiveCommand " + commandId + " " + args);
+        Log.i(TAG, "receiveCommand " + commandId);
 
         if (!Chart.class.isInstance(root)) {
             return;
@@ -226,6 +229,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 break;
             case COMMAND_ADD_NEW_ENTRY:
                 addNewEntry(chart, args.getMap(0));
+                break;
+            case COMMAND_LOAD_MORE_COMPLETE:
+                loadMoreComplete(chart, args.getMap(0));
                 break;
         }
     }
@@ -341,6 +347,16 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
      * @param readableMap
      */
     protected void addNewEntry(Chart chart, ReadableMap readableMap) {
+
+    }
+
+    /**
+     * RN得到加载更多的数据
+     *
+     * @param chart
+     * @param readableMap
+     */
+    protected void loadMoreComplete(Chart chart, ReadableMap readableMap) {
 
     }
 }

@@ -29,6 +29,7 @@ import com.github.wuxudong.rncharts.listener.RNOnChartGestureListener;
 import com.github.wuxudong.rncharts.listener.RNOnChartValueSelectedListener;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 import com.github.wuxudong.rncharts.utils.FloatLabelUtil;
+import com.github.wuxudong.rncharts.utils.LoadMoreUtils;
 
 import java.util.Arrays;
 
@@ -297,5 +298,10 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
         combinedData.notifyDataChanged();
         combinedChart.notifyDataSetChanged();
         combinedChart.postInvalidate();
+    }
+
+    @Override
+    protected void loadMoreComplete(Chart chart, ReadableMap readableMap) {
+        LoadMoreUtils.loadMoreComplete(chart, readableMap);
     }
 }
