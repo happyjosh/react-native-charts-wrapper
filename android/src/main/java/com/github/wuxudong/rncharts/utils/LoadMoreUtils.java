@@ -16,6 +16,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
+import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -23,6 +24,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.wuxudong.rncharts.formatter.TimeIndexAxisValueFormatter;
+import com.github.wuxudong.rncharts.listener.LoadCompleteOnChartGestureListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +66,7 @@ public class LoadMoreUtils {
         combinedChart.stopDeceleration();
         combinedChart.clearAllViewportJobs();
 
-        float oldCount = getDataCount(combinedData);
+        float oldCount = getCombinedDataCount(combinedData);
 
         float oldScaleMinX = combinedChart.getViewPortHandler().getMinScaleX();
         float oldScaleMaxX = combinedChart.getViewPortHandler().getMaxScaleX();
@@ -114,7 +116,7 @@ public class LoadMoreUtils {
         //定位到之前的位置和缩放表现
 
         //通过前后数据的比例，计算出新的缩放参数
-        float ratio = (float) getDataCount(combinedData) / oldCount;
+        float ratio = (float) getCombinedDataCount(combinedData) / oldCount;
 
         float newScaleMinX = ratio * oldScaleMinX;
         float newScaleMaxX = ratio * oldScaleMaxX;
@@ -125,6 +127,12 @@ public class LoadMoreUtils {
 
         combinedChart.setScaleMinima(newScaleMinX, 1);
         combinedChart.setScaleMaxima(newScaleMaxX, 1);
+
+        //允许继续加载
+        if (chart.getOnChartGestureListener() instanceof LoadCompleteOnChartGestureListener) {
+            ((LoadCompleteOnChartGestureListener) chart.getOnChartGestureListener())
+                    .setLoadComplete(true);
+        }
     }
 
     /**
@@ -276,9 +284,55 @@ public class LoadMoreUtils {
         candleData.notifyDataChanged();
     }
 
-    private static int getDataCount(CombinedData combinedData) {
-        //TODO 暂时以蜡烛数据来判断
+    /**
+     * 获得CombinedData中所有类型数据的总数最大值
+     *
+     * @param combinedData
+     * @return
+     */
+    private static int getCombinedDataCount(CombinedData combinedData) {
+        int count = 0;
+
+        //TODO 暂时只判断了这几种数据
         CandleData candleData = combinedData.getCandleData();
-        return candleData.getDataSetByIndex(0).getEntryCount();
+        LineData lineData = combinedData.getLineData();
+        BarData barData = combinedData.getBarData();
+
+        if (candleData != null) {
+            int candleCount = getDataCount(candleData);
+            count = Math.max(count, candleCount);
+            Log.i(TAG, "candleCount:" + candleCount);
+        }
+        if (lineData != null) {
+            int lineCount = getDataCount(lineData);
+            count = Math.max(count, lineCount);
+            Log.i(TAG, "lineCount:" + lineCount);
+        }
+        if (barData != null) {
+            int barCount = getDataCount(barData);
+            count = Math.max(count, barCount);
+            Log.i(TAG, "barCount:" + barCount);
+        }
+
+        Log.i(TAG, "count:" + count);
+        return count;
+    }
+
+    /**
+     * 获得某种类型数据的总数最大值
+     *
+     * @param chartData
+     * @return
+     */
+    private static int getDataCount(ChartData chartData) {
+        int count = 0;
+
+        if (chartData != null) {
+            for (int i = 0; i < chartData.getDataSetCount(); i++) {
+                count = Math.max(chartData.getDataSetByIndex(i).getEntryCount(), count);
+            }
+        }
+
+        return count;
     }
 }

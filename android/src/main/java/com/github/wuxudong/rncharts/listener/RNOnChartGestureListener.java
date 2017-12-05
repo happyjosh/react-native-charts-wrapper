@@ -9,7 +9,6 @@ import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.listener.ChartTouchListener;
-import com.github.mikephil.charting.listener.OnChartGestureListener;
 
 import java.lang.ref.WeakReference;
 
@@ -17,7 +16,7 @@ import java.lang.ref.WeakReference;
  * 实现了手势监听，调用JS（暂时未全部实现）
  * Created by jph on 2017/9/27.
  */
-public class RNOnChartGestureListener implements OnChartGestureListener {
+public class RNOnChartGestureListener extends LoadCompleteOnChartGestureListener {
 
     private static final String TAG = RNOnChartGestureListener.class.getSimpleName();
 
@@ -51,7 +50,8 @@ public class RNOnChartGestureListener implements OnChartGestureListener {
 
         if (lastPerformedGesture == ChartTouchListener.ChartGesture.DRAG) {
             mIsCanLoad = true;
-            if (leftX <= loadChart.getXAxis().getAxisMinimum()) {
+            //加载未完成不允许不断拉动加载
+            if (isLoadComplete() && leftX <= loadChart.getXAxis().getAxisMinimum()) {
                 mIsCanLoad = false;
                 //加载更多数据的操作
                 callOnLoadMore();
@@ -107,7 +107,8 @@ public class RNOnChartGestureListener implements OnChartGestureListener {
         CombinedChart loadChart = (CombinedChart) chart;
         if (mIsCanLoad) {
             float leftX = loadChart.getLowestVisibleX();     //获取可视区域中，显示在x轴最右边的index
-            if (leftX <= loadChart.getXAxis().getAxisMinimum()) {
+            //加载未完成不允许不断拉动加载
+            if (isLoadComplete() && leftX <= loadChart.getXAxis().getAxisMinimum()) {
                 mIsCanLoad = false;
                 //加载更多数据的操作
                 callOnLoadMore();
@@ -120,6 +121,8 @@ public class RNOnChartGestureListener implements OnChartGestureListener {
         if (mWeakChart == null) {
             return;
         }
+        setLoadComplete(false);
+
         Chart chart = mWeakChart.get();
 
         ReactContext reactContext = (ReactContext) chart.getContext();

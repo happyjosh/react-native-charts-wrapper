@@ -19,6 +19,7 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.wuxudong.rncharts.listener.LoadCompleteOnChartGestureListener;
 
 import java.util.List;
 
@@ -190,7 +191,7 @@ public class BindChartModule extends ReactContextBaseJavaModule {
         return new int[]{-1, -1};
     }
 
-    static class LinkOnChartGestureListener implements OnChartGestureListener {
+    static class LinkOnChartGestureListener extends LoadCompleteOnChartGestureListener {
 
         private Chart chart1, chart2;
         private OnChartGestureListener oldOnChartGestureListener;
@@ -200,6 +201,26 @@ public class BindChartModule extends ReactContextBaseJavaModule {
             this.chart2 = chart2;
 
             this.oldOnChartGestureListener = chart1.getOnChartGestureListener();
+        }
+
+        @Override
+        public void setLoadComplete(boolean loadComplete) {
+            //会从外部直接获取OnChartGestureListener对象来标识内部的可加载状态flag
+            if (this.oldOnChartGestureListener != null &&
+                    this.oldOnChartGestureListener instanceof LoadCompleteOnChartGestureListener) {
+                ((LoadCompleteOnChartGestureListener) this.oldOnChartGestureListener)
+                        .setLoadComplete(loadComplete);
+            }
+        }
+
+        @Override
+        public boolean isLoadComplete() {
+            if (this.oldOnChartGestureListener != null &&
+                    this.oldOnChartGestureListener instanceof LoadCompleteOnChartGestureListener) {
+                return ((LoadCompleteOnChartGestureListener) this.oldOnChartGestureListener)
+                        .isLoadComplete();
+            }
+            return super.isLoadComplete();
         }
 
         @Override
