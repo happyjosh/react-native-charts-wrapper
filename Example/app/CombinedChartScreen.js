@@ -386,14 +386,16 @@ export default class Combined extends Component {
   }
 
   testLoadMore = () => {
+    const testLoadMoreData = [...candleData];
+
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
       UIManager.RNCombinedChart.Commands.loadMoreComplete,
       [{
         data: {
-          candleEntries: [candleData.concat()],
+          candleEntries: [testLoadMoreData],
         },
-        timestamp: candleData.map(item => this.nowTime)
+        timestamp: testLoadMoreData.map(item => this.nowTime)
       }]
     );
 

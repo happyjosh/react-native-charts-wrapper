@@ -45,7 +45,6 @@ let as = [
   {shadowH: 93.77, shadowL: 92.59, open: 93, close: 92.82},
   {shadowH: 93.57, shadowL: 92.11, open: 93.33, close: 93.39},
   {shadowH: 93.57, shadowL: 92.46, open: 93.48, close: 92.51},
-  {shadowH: 92.78, shadowL: 89.47, open: 92.72, close: 90.32},
   {shadowH: 91.67, shadowL: 90, open: 90, close: 90.52},
 ];
 

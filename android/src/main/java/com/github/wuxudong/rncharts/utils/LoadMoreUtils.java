@@ -27,7 +27,6 @@ import com.github.wuxudong.rncharts.formatter.TimeIndexAxisValueFormatter;
 import com.github.wuxudong.rncharts.listener.LoadCompleteOnChartGestureListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -58,9 +57,6 @@ public class LoadMoreUtils {
         if (dataMap == null) {
             return;
         }
-
-        float oldMin = combinedChart.getXAxis().getAxisMinimum();//X轴的尽头
-        float oldMinX = oldMin + combinedChart.getXAxis().getSpaceMin();//尽头对应的坐标值
 
         //必须停止惯性滑动，不然刷新数据后会继续之前未完的任务
         combinedChart.stopDeceleration();
@@ -97,10 +93,16 @@ public class LoadMoreUtils {
                 //往坐标上插入数据
                 TimeIndexAxisValueFormatter timeIndexAxisValueFormatter = (TimeIndexAxisValueFormatter) valueFormatter;
                 long[] oldValues = timeIndexAxisValueFormatter.getValues();
-                long[] newValues = Arrays.copyOf(oldValues, timeArray.size());
 
-                for (int i = oldValues.length; i < newValues.length; i++) {
-                    newValues[i] = (long) timeArray.getDouble(newValues.length - i);
+                int timeSize = timeArray.size();
+                long[] newValues = new long[timeSize + oldValues.length];
+
+                for (int i = 0, c = timeSize; i < c; i++) {
+                    newValues[i] = (long) timeArray.getDouble(i);
+                }
+
+                for (int i = timeSize; i < newValues.length; i++) {
+                    newValues[i] = oldValues[i - timeSize];
                 }
 
                 timeIndexAxisValueFormatter.setValues(newValues);
@@ -115,15 +117,16 @@ public class LoadMoreUtils {
 
         //定位到之前的位置和缩放表现
 
+        int newCount = getCombinedDataCount(combinedData);
         //通过前后数据的比例，计算出新的缩放参数
-        float ratio = (float) getCombinedDataCount(combinedData) / oldCount;
+        float ratio = (float) newCount / oldCount;
 
         float newScaleMinX = ratio * oldScaleMinX;
         float newScaleMaxX = ratio * oldScaleMaxX;
         float newScaleX = ratio * oldScaleX;
 
         combinedChart.setScaleMinima(newScaleX, 1);//避免数据修改后改变缩放表现
-        combinedChart.moveViewTo(oldMin, 0, YAxis.AxisDependency.RIGHT);
+        combinedChart.moveViewTo(newCount - oldCount - chart.getXAxis().getSpaceMin(), 0, YAxis.AxisDependency.RIGHT);
 
         combinedChart.setScaleMinima(newScaleMinX, 1);
         combinedChart.setScaleMaxima(newScaleMaxX, 1);
@@ -156,7 +159,6 @@ public class LoadMoreUtils {
             LineDataSet lineDataSet = (LineDataSet) dataSet;
 
             List<Entry> oldDataList = new ArrayList<>(lineDataSet.getValues());
-            float oldDataFirstX = dataSet.getEntryForIndex(0).getX();//现有数据第一条的x值
 
             ReadableArray aEntries = lineEntries.getArray(i);//得到某一个折线图对应的新数据
 
@@ -167,7 +169,7 @@ public class LoadMoreUtils {
             List<Entry> newDataList = new ArrayList<>();
             //遍历某个折线对应的新数据
             for (int j = 0; j < newDataCount; j++) {
-                float x = oldDataFirstX - newDataCount + j;
+                float x = j;
                 float lineValue = (float) aEntries.getMap(j).getDouble("y");
                 newDataList.add(new Entry(x, lineValue));
             }
@@ -175,6 +177,11 @@ public class LoadMoreUtils {
             lineDataSet.getValues().clear();//清空之前的数据
 
             lineDataSet.getValues().addAll(newDataList);//插入新数据
+
+            //为老数据设置新的x值
+            for (int j = 0, c = oldDataList.size(); j < c; j++) {
+                oldDataList.get(j).setX(newDataCount + j);
+            }
             lineDataSet.getValues().addAll(oldDataList);//追加之前的老数据
 
             lineDataSet.notifyDataSetChanged();//通知数据改变，计算最大最小值
@@ -203,7 +210,6 @@ public class LoadMoreUtils {
             BarDataSet barDataSet = (BarDataSet) dataSet;
 
             List<BarEntry> oldDataList = new ArrayList<>(barDataSet.getValues());
-            float oldDataFirstX = dataSet.getEntryForIndex(0).getX();//现有数据第一条的x值
 
             ReadableArray aEntries = barEntries.getArray(i);//得到某一个柱形图对应的新数据
 
@@ -212,9 +218,9 @@ public class LoadMoreUtils {
             }
             int newDataCount = aEntries.size();
             List<BarEntry> newDataList = new ArrayList<>();
-            //遍历某个折线对应的新数据
+            //遍历某个柱形图对应的新数据
             for (int j = 0; j < newDataCount; j++) {
-                float x = oldDataFirstX - newDataCount + j;
+                float x = j;
                 float barValue = (float) aEntries.getMap(j).getDouble("y");
                 newDataList.add(new BarEntry(x, barValue));
             }
@@ -222,6 +228,11 @@ public class LoadMoreUtils {
             barDataSet.getValues().clear();//清空之前的数据
 
             barDataSet.getValues().addAll(newDataList);//插入新数据
+
+            //为老数据设置新的x值
+            for (int j = 0, c = oldDataList.size(); j < c; j++) {
+                oldDataList.get(j).setX(newDataCount + j);
+            }
             barDataSet.getValues().addAll(oldDataList);//追加之前的老数据
 
             barDataSet.notifyDataSetChanged();//通知数据改变，计算最大最小值
@@ -250,7 +261,6 @@ public class LoadMoreUtils {
             CandleDataSet candleDataSet = (CandleDataSet) dataSet;
 
             List<CandleEntry> oldDataList = new ArrayList<>(candleDataSet.getValues());
-            float oldDataFirstX = dataSet.getEntryForIndex(0).getX();//现有数据第一条的x值
 
             ReadableArray aEntries = candleEntries.getArray(i);//得到某一个蜡烛图对应的新数据
 
@@ -259,9 +269,9 @@ public class LoadMoreUtils {
             }
             int newDataCount = aEntries.size();
             List<CandleEntry> newDataList = new ArrayList<>();
-            //遍历某个折线对应的新数据
+            //遍历某个蜡烛图对应的新数据
             for (int j = 0; j < newDataCount; j++) {
-                float x = oldDataFirstX - newDataCount + j;
+                float x = j;
 
                 ReadableMap candleEntry = aEntries.getMap(j);
                 float open = (float) candleEntry.getDouble("open");
@@ -277,6 +287,11 @@ public class LoadMoreUtils {
             candleDataSet.getValues().clear();//清空之前的数据
 
             candleDataSet.getValues().addAll(newDataList);//插入新数据
+
+            //为老数据设置新的x值
+            for (int j = 0, c = oldDataList.size(); j < c; j++) {
+                oldDataList.get(j).setX(newDataCount + j);
+            }
             candleDataSet.getValues().addAll(oldDataList);//追加之前的老数据
 
             candleDataSet.notifyDataSetChanged();//通知数据改变，计算最大最小值
