@@ -109,14 +109,6 @@ public class LoadMoreUtils {
             }
         }
 
-        combinedData.notifyDataChanged();
-        combinedChart.notifyDataSetChanged();
-        combinedChart.postInvalidate();
-
-        combinedChart.notifyDataSetChanged();
-
-        //定位到之前的位置和缩放表现
-
         int newCount = getCombinedDataCount(combinedData);
         //通过前后数据的比例，计算出新的缩放参数
         float ratio = (float) newCount / oldCount;
@@ -125,6 +117,10 @@ public class LoadMoreUtils {
         float newScaleMaxX = ratio * oldScaleMaxX;
         float newScaleX = ratio * oldScaleX;
 
+        combinedData.notifyDataChanged();
+        combinedChart.notifyDataSetChanged();
+
+        //定位到之前的位置和缩放表现
         combinedChart.setScaleMinima(newScaleX, 1);//避免数据修改后改变缩放表现
         combinedChart.moveViewTo(newCount - oldCount - chart.getXAxis().getSpaceMin(), 0, YAxis.AxisDependency.RIGHT);
 
