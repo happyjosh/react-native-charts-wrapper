@@ -28,6 +28,7 @@ import com.github.wuxudong.rncharts.formatter.TimeIndexAxisValueFormatter;
 import com.github.wuxudong.rncharts.listener.RNOnChartGestureListener;
 import com.github.wuxudong.rncharts.listener.RNOnChartValueSelectedListener;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
+import com.github.wuxudong.rncharts.utils.ConversionUtil;
 import com.github.wuxudong.rncharts.utils.FloatLabelUtil;
 import com.github.wuxudong.rncharts.utils.LoadMoreUtils;
 
@@ -114,8 +115,8 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 barData != null) {
             ReadableArray barEntries = readableMap.getArray("barEntries");
             for (int i = 0; i < barEntries.size(); i++) {
-                ReadableMap lineEntry = barEntries.getMap(i);
-                float barValue = (float) lineEntry.getDouble("y");
+                ReadableMap barEntry = barEntries.getMap(i);
+                float barValue = (float) barEntry.getDouble("y");
                 IDataSet dataSet = barData.getDataSetByIndex(i);
                 if (dataSet == null || dataSet.getEntryCount() <= 0) {
                     continue;
@@ -130,11 +131,11 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 candleData != null) {
             ReadableArray candleEntries = readableMap.getArray("candleEntries");
             for (int i = 0; i < candleEntries.size(); i++) {
-                ReadableMap lineEntry = candleEntries.getMap(i);
-                float open = (float) lineEntry.getDouble("open");
-                float close = (float) lineEntry.getDouble("close");
-                float high = (float) lineEntry.getDouble("shadowH");
-                float low = (float) lineEntry.getDouble("shadowL");
+                ReadableMap candleEntryMap = candleEntries.getMap(i);
+                float open = (float) candleEntryMap.getDouble("open");
+                float close = (float) candleEntryMap.getDouble("close");
+                float high = (float) candleEntryMap.getDouble("shadowH");
+                float low = (float) candleEntryMap.getDouble("shadowL");
                 ICandleDataSet dataSet = candleData.getDataSetByIndex(i);
                 if (dataSet == null || dataSet.getEntryCount() <= 0) {
                     continue;
@@ -272,7 +273,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 }
                 CandleEntry candleEntry = new CandleEntry(
                         dataSet.getEntryForIndex(dataSet.getEntryCount() - 1).getX() + 1, high, low,
-                        open, close);
+                        open, close, ConversionUtil.toMap(lineEntry));
                 dataSet.addEntry(candleEntry);
             }
             candleData.notifyDataChanged();

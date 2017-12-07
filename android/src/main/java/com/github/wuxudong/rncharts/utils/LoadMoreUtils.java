@@ -277,7 +277,7 @@ public class LoadMoreUtils {
 
                 newDataList.add(new CandleEntry(
                         x, high, low,
-                        open, close));
+                        open, close, ConversionUtil.toMap(candleEntry)));
             }
 
             candleDataSet.getValues().clear();//清空之前的数据
