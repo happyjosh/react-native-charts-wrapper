@@ -386,7 +386,7 @@ export default class Combined extends Component {
   }
 
   testLoadMore = () => {
-    const testLoadMoreData = [...candleData];
+    const testLoadMoreData = [...candleData].reverse();
 
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs['chart1']), // 找到与NativeUI组件对应的JS组件实例
@@ -446,7 +446,7 @@ export default class Combined extends Component {
           onSingleTapped={(event) => {
             console.log('click');
           }}
-          onLoadMore={this.delayLoadMore.bind(this)}
+           onLoadMore={this.delayLoadMore.bind(this)}
         />
 
         <CombinedChart
@@ -469,7 +469,7 @@ export default class Combined extends Component {
           // onMatrixChange={(event) => this.handleChartMatrixChange(event, 'chart1')}
           // onGetExtraOffset={(event) => this.handleChart2ExtraOffset(event)}
           rightSelectLabel={this.state.rightSelectLabel}
-          onSingleTapped={this.delayLoadMore.bind(this)}
+          // onSingleTapped={this.testLoadMore.bind(this)}
         />
       </View>
     );

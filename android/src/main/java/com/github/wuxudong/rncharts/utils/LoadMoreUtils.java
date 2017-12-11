@@ -37,31 +37,40 @@ public class LoadMoreUtils {
 
     private static final String TAG = LoadMoreUtils.class.getSimpleName();
 
-    public static void loadMoreComplete(Chart chart, ReadableMap readableMap) {
+    public static void loadMoreComplete(Chart chart, final ReadableMap readableMap) {
         if (!CombinedChart.class.isInstance(chart)) {
             return;
         }
-        CombinedChart combinedChart = (CombinedChart) chart;
+        final CombinedChart combinedChart = (CombinedChart) chart;
         Log.i(TAG, "loadMoreComplete");
 
-        CombinedData combinedData = combinedChart.getData();
+        final CombinedData combinedData = combinedChart.getData();
 
         if (combinedData == null) {
             return;
         }
-
-        ReadableMap dataMap = null;
-        if (BridgeUtils.validate(readableMap, ReadableType.Map, "data")) {
-            dataMap = readableMap.getMap("data");
-        }
-        if (dataMap == null) {
+        if (!BridgeUtils.validate(readableMap, ReadableType.Map, "data")) {
             return;
         }
+        final ReadableMap dataMap = readableMap.getMap("data");
+
 
         //必须停止惯性滑动，不然刷新数据后会继续之前未完的任务
         combinedChart.stopDeceleration();
         combinedChart.clearAllViewportJobs();
 
+        combinedChart.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                processData(combinedChart, combinedData, readableMap, dataMap);
+            }
+        }, 300);
+
+
+    }
+
+    private static void processData(CombinedChart combinedChart, CombinedData combinedData,
+                                    ReadableMap readableMap, ReadableMap dataMap) {
         float oldCount = getCombinedDataCount(combinedData);
 
         float oldScaleMinX = combinedChart.getViewPortHandler().getMinScaleX();
@@ -122,14 +131,14 @@ public class LoadMoreUtils {
 
         //定位到之前的位置和缩放表现
         combinedChart.setScaleMinima(newScaleX, 1);//避免数据修改后改变缩放表现
-        combinedChart.moveViewTo(newCount - oldCount - chart.getXAxis().getSpaceMin(), 0, YAxis.AxisDependency.RIGHT);
+        combinedChart.moveViewTo(newCount - oldCount - combinedChart.getXAxis().getSpaceMin(), 0, YAxis.AxisDependency.RIGHT);
 
         combinedChart.setScaleMinima(newScaleMinX, 1);
         combinedChart.setScaleMaxima(newScaleMaxX, 1);
 
         //允许继续加载
-        if (chart.getOnChartGestureListener() instanceof LoadCompleteOnChartGestureListener) {
-            ((LoadCompleteOnChartGestureListener) chart.getOnChartGestureListener())
+        if (combinedChart.getOnChartGestureListener() instanceof LoadCompleteOnChartGestureListener) {
+            ((LoadCompleteOnChartGestureListener) combinedChart.getOnChartGestureListener())
                     .setLoadComplete(true);
         }
     }
