@@ -16,11 +16,13 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.FloatLabel;
+import com.github.mikephil.charting.charts.FloatLimitLineConfig;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 import com.github.wuxudong.rncharts.utils.FloatLabelUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -35,6 +37,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
     public static final int COMMAND_UPDATE_LAST_ENTRY = 6;
     public static final int COMMAND_ADD_NEW_ENTRY = 7;
     public static final int COMMAND_LOAD_MORE_COMPLETE = 8;
+    public static final int COMMAND_SET_FLOAT_Y_VALUE = 9;
 
     @Override
     public void setYAxis(Chart chart, ReadableMap propMap) {
@@ -176,25 +179,57 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         chart.setRightFloatYLabel(floatLabel);
     }
 
+
+    @ReactProp(name = "floatYLine")
+    public void setFloatYLine(BarLineChartBase chart, ReadableMap propMap) {
+        Log.i(TAG, "setFloatYLine");
+
+        FloatLimitLineConfig floatLimitLineConfig = new FloatLimitLineConfig();
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "lineColor")) {
+            floatLimitLineConfig.setLineColor(propMap.getInt("lineColor"));
+        }
+        if (BridgeUtils.validate(propMap, ReadableType.Number, "lineWidth")) {
+            floatLimitLineConfig.setLineWidth((float) propMap.getDouble("lineWidth"));
+        }
+
+        if (BridgeUtils.validate(propMap, ReadableType.Boolean, "enableDashLine")
+                && propMap.getBoolean("enableDashLine")) {
+            float lineLength = 0;
+            float spaceLength = 0;
+            float phase = 0;
+
+            floatLimitLineConfig.setEnableDashLine(true);
+
+            if (BridgeUtils.validate(propMap, ReadableType.Number, "dashLineLength")) {
+                lineLength = PixelUtil.toPixelFromDIP(propMap.getDouble("dashLineLength"));
+            }
+            if (BridgeUtils.validate(propMap, ReadableType.Number, "dashSpaceLength")) {
+                spaceLength = PixelUtil.toPixelFromDIP(propMap.getDouble("dashSpaceLength"));
+            }
+            if (BridgeUtils.validate(propMap, ReadableType.Number, "dashPhase")) {
+                phase = PixelUtil.toPixelFromDIP(propMap.getDouble("dashPhase"));
+            }
+
+            floatLimitLineConfig.setDashLineLength(lineLength);
+            floatLimitLineConfig.setDashSpaceLength(spaceLength);
+            floatLimitLineConfig.setDashPhase(phase);
+        }
+        chart.setFloatLimitLineConfig(floatLimitLineConfig);
+    }
+
     @Nullable
     @Override
     public Map<String, Integer> getCommandsMap() {
-        Map<String, Integer> map = MapBuilder.of(
-                "getExtraOffset",
-                COMMAND_GET_EXTRA_OFFSET,
-                "setOneExtraOffset",
-                COMMAND_SET_ONE_EXTRA_OFFSET,
-                "stopDeceleration",
-                COMMAND_STOP_DECELERATION,
-                "resetChart",
-                COMMAND_RESET_CHART,
-                "updateLastEntry",
-                COMMAND_UPDATE_LAST_ENTRY,
-                "addNewEntry",
-                COMMAND_ADD_NEW_ENTRY,
-                "loadMoreComplete",
-                COMMAND_LOAD_MORE_COMPLETE
-        );
+        Map<String, Integer> map = new HashMap<>();
+        map.put("getExtraOffset", COMMAND_GET_EXTRA_OFFSET);
+        map.put("setOneExtraOffset", COMMAND_SET_ONE_EXTRA_OFFSET);
+        map.put("stopDeceleration", COMMAND_STOP_DECELERATION);
+        map.put("resetChart", COMMAND_RESET_CHART);
+        map.put("updateLastEntry", COMMAND_UPDATE_LAST_ENTRY);
+        map.put("addNewEntry", COMMAND_ADD_NEW_ENTRY);
+        map.put("loadMoreComplete", COMMAND_LOAD_MORE_COMPLETE);
+        map.put("setFloatYValue", COMMAND_SET_FLOAT_Y_VALUE);
+
         if (super.getCommandsMap() != null) {
             map.putAll(super.getCommandsMap());
         }
@@ -232,6 +267,9 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 break;
             case COMMAND_LOAD_MORE_COMPLETE:
                 loadMoreComplete(chart, args.getMap(0));
+                break;
+            case COMMAND_SET_FLOAT_Y_VALUE:
+                setFloatYValue(chart, (float) args.getDouble(0));
                 break;
         }
     }
@@ -328,6 +366,14 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         barLineChartBase.getXAxis().removeAllLimitLines();
         barLineChartBase.getAxisLeft().removeAllLimitLines();
         barLineChartBase.getAxisRight().removeAllLimitLines();
+    }
+
+    private void setFloatYValue(Chart chart, float floatYValue) {
+        Log.i(TAG, "setFloatYValue");
+
+        BarLineChartBase barLineChartBase = (BarLineChartBase) chart;
+        barLineChartBase.setFloatYValue(floatYValue);
+
     }
 
     /**
