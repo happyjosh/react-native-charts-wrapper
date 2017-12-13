@@ -17,6 +17,7 @@ import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.FloatLabel;
 import com.github.mikephil.charting.charts.FloatLimitLineConfig;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
@@ -269,7 +270,7 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
                 loadMoreComplete(chart, args.getMap(0));
                 break;
             case COMMAND_SET_FLOAT_Y_VALUE:
-                setFloatYValue(chart, (float) args.getDouble(0));
+                setFloatYValue(chart, args.getMap(0));
                 break;
         }
     }
@@ -368,11 +369,40 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
         barLineChartBase.getAxisRight().removeAllLimitLines();
     }
 
-    private void setFloatYValue(Chart chart, float floatYValue) {
+    /**
+     * 设置的悬浮的Y值，同时设置了FloatLabel和FloatLimitLine的颜色
+     *
+     * @param chart
+     * @param readableMap
+     */
+    private void setFloatYValue(Chart chart, ReadableMap readableMap) {
         Log.i(TAG, "setFloatYValue");
 
         BarLineChartBase barLineChartBase = (BarLineChartBase) chart;
-        barLineChartBase.setFloatYValue(floatYValue);
+
+        if (BridgeUtils.validate(readableMap, ReadableType.Number, "value")) {
+            float floatYValue = (float) readableMap.getDouble("value");
+            barLineChartBase.setFloatYValue(floatYValue);
+        }
+
+        if (BridgeUtils.validate(readableMap, ReadableType.Number, "value")) {
+            int color = readableMap.getInt("color");
+
+            FloatLabel floatLabel = barLineChartBase.getRightFloatYLabel();
+            if (floatLabel != null) {
+                floatLabel.getLabelText().setBackgroundColor(color);
+            }
+
+            FloatLimitLineConfig floatLimitLineConfig = barLineChartBase.getFloatLimitLineConfig();
+            if (floatLimitLineConfig != null) {
+                floatLimitLineConfig.setLineColor(color);
+            }
+
+            LimitLine limitLine = barLineChartBase.getRightFloatYLimitLine();
+            if (limitLine != null) {
+                limitLine.setLineColor(color);
+            }
+        }
 
     }
 
