@@ -1,5 +1,7 @@
 package com.github.wuxudong.rncharts.utils;
 
+import android.util.TypedValue;
+
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.uimanager.PixelUtil;
@@ -19,7 +21,8 @@ public class FloatLabelUtil {
             floatLabel.getLabelText().setTextColor(propMap.getInt("textColor"));
         }
         if (BridgeUtils.validate(propMap, ReadableType.Number, "textSize")) {
-            floatLabel.getLabelText().setTextSize(propMap.getInt("textSize"));
+            floatLabel.getLabelText().setTextSize(TypedValue.COMPLEX_UNIT_DIP,
+                    (float) propMap.getDouble("textSize"));
         }
 
         if (BridgeUtils.validate(propMap, ReadableType.Number, "backgroundColor")) {
