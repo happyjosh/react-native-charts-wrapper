@@ -58,11 +58,13 @@ public class LoadMoreUtils {
         //必须停止惯性滑动，不然刷新数据后会继续之前未完的任务
         combinedChart.stopDeceleration();
         combinedChart.clearAllViewportJobs();
+        combinedChart.setTouchEnabled(false);
 
         combinedChart.postDelayed(new Runnable() {
             @Override
             public void run() {
                 processData(combinedChart, combinedData, readableMap, dataMap);
+                combinedChart.setTouchEnabled(true);
             }
         }, 300);
 
