@@ -33,6 +33,9 @@ public class RNOnChartValueSelectedListener implements OnChartValueSelectedListe
                     chart.getId(),
                     "topSelect",
                     EntryToWritableMapUtils.convertEntryToWritableMap(entry));
+
+            //解决在ScrollView中选中消失问题
+            chart.requestDisallowInterceptTouchEvent(true);
         }
     }
 
@@ -46,6 +49,9 @@ public class RNOnChartValueSelectedListener implements OnChartValueSelectedListe
                     chart.getId(),
                     "topSelect",
                     null);
+
+            //解决在ScrollView中选中消失问题
+            chart.requestDisallowInterceptTouchEvent(false);
         }
 
     }
