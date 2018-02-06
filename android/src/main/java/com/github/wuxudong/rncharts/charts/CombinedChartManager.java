@@ -235,6 +235,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                 dataSet.addEntry(new BarEntry(
                         dataSet.getEntryForIndex(dataSet.getEntryCount() - 1).getX() + 1,
                         barValue));
+                dataSet.getColors().add(lineEntry.getInt("color"));
             }
             barData.notifyDataChanged();
         }
