@@ -122,6 +122,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                     continue;
                 }
                 dataSet.getEntryForIndex(dataSet.getEntryCount() - 1).setY(barValue);
+                dataSet.getColors().set(dataSet.getEntryCount() - 1, barEntry.getInt("color"));
             }
             barData.notifyDataChanged();
         }
@@ -160,7 +161,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
             return;
         }
         CombinedChart combinedChart = (CombinedChart) chart;
-        Log.i(TAG, "updateLastEntry");
+        Log.i(TAG, "addNewEntry");
 
         CombinedData combinedData = combinedChart.getData();
 
