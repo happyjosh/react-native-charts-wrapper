@@ -224,6 +224,7 @@ public class CombinedChartManager extends BarLineChartBaseManager<CombinedChart,
                     continue;
                 }
                 dataSet.getEntryForIndex(dataSet.getEntryCount() - 1).setY(barValue);
+                dataSet.getColors().set(dataSet.getEntryCount() - 1, lineEntry.getInt("color"));
             }
             ReadableArray barEntries2 = readableMap2.getArray("barEntries");
             for (int i = 0; i < barEntries2.size(); i++) {
