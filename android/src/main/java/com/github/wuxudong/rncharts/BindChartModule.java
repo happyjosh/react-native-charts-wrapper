@@ -19,6 +19,7 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.wuxudong.rncharts.charts.XCombinedChart;
 import com.github.wuxudong.rncharts.listener.LoadCompleteOnChartGestureListener;
 
 import java.util.List;
@@ -90,7 +91,13 @@ public class BindChartModule extends ReactContextBaseJavaModule {
                 if (oldChart1SelectedListener != null) {
                     oldChart1SelectedListener.onNothingSelected();
                 }
-                chart2.highlightValue(null);
+
+                //同步动作需要立即处理状态改变
+                if (chart2 instanceof XCombinedChart) {
+                    ((XCombinedChart) chart2).immediateHighlightValue(null);
+                } else {
+                    chart2.highlightValue(null);
+                }
             }
         });
         chart2.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -107,7 +114,13 @@ public class BindChartModule extends ReactContextBaseJavaModule {
                 if (oldChart2SelectedListener != null) {
                     oldChart2SelectedListener.onNothingSelected();
                 }
-                chart1.highlightValue(null);
+
+                //同步动作需要立即处理状态改变
+                if (chart1 instanceof XCombinedChart) {
+                    ((XCombinedChart) chart1).immediateHighlightValue(null);
+                } else {
+                    chart1.highlightValue(null);
+                }
             }
         });
     }
