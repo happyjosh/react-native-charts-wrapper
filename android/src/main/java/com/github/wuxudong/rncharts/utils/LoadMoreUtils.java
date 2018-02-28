@@ -216,6 +216,9 @@ public class LoadMoreUtils {
 
             BarDataSet barDataSet = (BarDataSet) dataSet;
 
+            List<Integer> oldColorList = new ArrayList<>(barDataSet.getColors());
+            List<Integer> newColorList = new ArrayList<>();
+
             List<BarEntry> oldDataList = new ArrayList<>(barDataSet.getValues());
 
             ReadableArray aEntries = barEntries.getArray(i);//得到某一个柱形图对应的新数据
@@ -228,13 +231,20 @@ public class LoadMoreUtils {
             //遍历某个柱形图对应的新数据
             for (int j = 0; j < newDataCount; j++) {
                 float x = j;
-                float barValue = (float) aEntries.getMap(j).getDouble("y");
+                ReadableMap barMap = aEntries.getMap(j);
+                float barValue = (float) barMap.getDouble("y");
                 newDataList.add(new BarEntry(x, barValue));
+                newColorList.add(barMap.getInt("color"));
             }
 
             barDataSet.getValues().clear();//清空之前的数据
-
             barDataSet.getValues().addAll(newDataList);//插入新数据
+
+            if (barDataSet.getColors() != null) {
+                barDataSet.getColors().clear();
+                barDataSet.getColors().addAll(newColorList);
+                barDataSet.getColors().addAll(oldColorList);
+            }
 
             //为老数据设置新的x值
             for (int j = 0, c = oldDataList.size(); j < c; j++) {
